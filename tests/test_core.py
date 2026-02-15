@@ -1,22 +1,24 @@
 import pytest
 from src.analyzer import CreditAnalyzer
 
-def test_utilization_calculation():
-    """Test that utilization is calculated correctly."""
+def test_can_calculate_credit_usage():
+    """Check if the math works on sample transactions"""
     analyzer = CreditAnalyzer()
-    txns = [
-        {"amount": 1000, "type": "purchase"},
-        {"amount": 500, "type": "payment"}
+    test_data = [
+        {"amount": 500, "type": "purchase"},
+        {"amount": 200, "type": "payment"}
     ]
-    result = analyzer.calculate_utilization(txns, limit=5000)
-    assert result["utilization_rate"] == 0.1  # (1000-500)/5000 = 0.1
-    assert result["status"] == "healthy"
+    result = analyzer.calculate_utilization(test_data, credit_limit=1000)
+    # 500 spent - 200 paid = 300 used out of 1000 = 30%
+    assert result["utilization_rate"] == 0.30
 
-def test_heuristic_scoring():
-    """Test that transaction scoring follows rules."""
+def test_payment_suggestion_logic():
+    """Test that suggestions trigger correctly for high utilization."""
     analyzer = CreditAnalyzer(alert_threshold=0.7)
-    score = analyzer.score_transaction({"amount": 1200, "merchant": "test"})
-    assert score == 0.9
+    # 800/1000 = 80% (triggers alert)
+    suggestion = analyzer.get_payment_suggestion(800, 1000)
+    assert "Suggested payment" in suggestion
     
-    score = analyzer.score_transaction({"amount": 100, "merchant": "test"})
-    assert score == 0.1
+    # 100/1000 = 10% (healthy)
+    suggestion = analyzer.get_payment_suggestion(100, 1000)
+    assert "Utilization is healthy" in suggestion

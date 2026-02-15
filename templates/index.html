@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Credit-Worthy Dashboard</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+
+        .warning {
+            color: darkred;
+            font-weight: bold;
+        }
+
+        .healthy {
+            color: darkgreen;
+        }
+
+        form {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        input,
+        select {
+            margin: 0.5rem 0;
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Credit-Worthy</h1>
+    <p>Local credit monitoring and optimization.</p>
+
+    <h2>Your Accounts</h2>
+    {% for acct in accounts %}
+    <div class="card">
+        <h3>{{ acct.name }}</h3>
+        <p>Limit: ${{ acct.credit_limit }}</p>
+        <p>Current Balance: ${{ acct.balance }}</p>
+        <p>Utilization: <span class="{{ 'warning' if acct.utilization > 70 else 'healthy' }}">{{ acct.utilization
+                }}%</span></p>
+        <p><em>{{ acct.suggestion }}</em></p>
+
+        <form action="/add_transaction" method="POST">
+            <input type="hidden" name="account_id" value="{{ acct.id }}">
+            <input type="number" name="amount" placeholder="Amount" step="0.01" required>
+            <select name="type">
+                <option value="purchase">Purchase</option>
+                <option value="payment">Payment</option>
+            </select>
+            <button type="submit">Add Transaction</button>
+        </form>
+    </div>
+    {% endfor %}
+
+    <h2>Add New Account</h2>
+    <form action="/add_account" method="POST">
+        <input type="text" name="name" placeholder="Account Name (e.g. Visa Gold)" required>
+        <input type="number" name="limit" placeholder="Credit Limit" required>
+        <button type="submit">Add Account</button>
+    </form>
+</body>
+
+</html>
