@@ -1,0 +1,4 @@
+heuristics:
+  proactive_signal: 0.8
+  aggression_threshold: 0.7
+  liability_neutralization: true
