@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | CredStack</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container fade-in">
+        <header>
+            <div class="logo">CredStack</div>
+        </header>
+
+        <main style="text-align: center; max-width: 500px; margin: 0 auto;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Create Your Account</h1>
+            <p style="font-size: 1rem; margin-bottom: 2rem; opacity: 0.8;">
+                Join CredStack and start automating your credit optimization today.
+            </p>
+
+            <div class="glass card" style="padding: 2rem;">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" style="margin-bottom: 1rem; padding: 0.75rem; border-radius: 0.5rem; {% if category == 'error' %}background: rgba(239, 68, 68, 0.1); color: #ef4444;{% else %}background: rgba(34, 197, 94, 0.1); color: #22c55e;{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('register') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    
+                    <div class="form-group" style="text-align: left;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Email Address</label>
+                        <input type="email" name="email" placeholder="you@example.com" required>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: left;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Full Name (optional)</label>
+                        <input type="text" name="name" placeholder="John Doe">
+                    </div>
+                    
+                    <div class="form-group" style="text-align: left;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Password</label>
+                        <input type="password" name="password" placeholder="At least 8 characters" required>
+                        <small style="display: block; margin-top: 0.25rem; opacity: 0.6; font-size: 0.8rem;">
+                            Must be at least 8 characters with letters and numbers
+                        </small>
+                    </div>
+                    
+                    <div class="form-group" style="text-align: left;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Confirm Password</label>
+                        <input type="password" name="password_confirm" placeholder="Re-enter password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+                </form>
+                
+                <p style="font-size: 0.9rem; margin-top: 1.5rem;">
+                    Already have an account? <a href="{{ url_for('index') }}" style="color: var(--primary); text-decoration: none;">Log in here</a>
+                </p>
+            </div>
+
+            <div style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.6; text-align: center;">
+                <p>By creating an account, you agree to our Terms of Service and Privacy Policy.</p>
+                <p>Your data is stored locally and never shared with third parties.</p>
+            </div>
+        </main>
+
+        <footer style="margin-top: 3rem; text-align: center; opacity: 0.5; font-size: 0.8rem;">
+            &copy; 2024 CredStack Open Source Project
+        </footer>
+    </div>
+</body>
+</html>
