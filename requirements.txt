@@ -3,3 +3,5 @@ flask-sqlalchemy
 pyyaml
 pytest
 requests
+click
+pytest-cov

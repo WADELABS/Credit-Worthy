@@ -9,7 +9,13 @@ setup(
         "flask-sqlalchemy",
         "pyyaml",
         "requests",
+        "click",
     ],
+    entry_points={
+        'console_scripts': [
+            'credstack=cli:cli',
+        ],
+    },
     author="WADELABS",
     description="A privacy-first credit utilization optimizer.",
     license="MIT",
