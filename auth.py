@@ -66,11 +66,13 @@ def generate_api_token():
 
 def create_jwt_token(user_id, email):
     """Create a JWT token for API authentication"""
+    from datetime import timezone
+    now = datetime.now(timezone.utc)
     payload = {
         'user_id': user_id,
         'email': email,
-        'exp': datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS),
-        'iat': datetime.utcnow()
+        'exp': now + timedelta(hours=JWT_EXPIRATION_HOURS),
+        'iat': now
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
