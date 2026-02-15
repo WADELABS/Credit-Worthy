@@ -9,21 +9,21 @@ class UtilizationHeuristic:
     """
     Evaluates credit utilization and provides aggression scores.
     """
-    def __init__(self, aggression_threshold: float = 0.7):
+    def __init__(self, alert_threshold: float = 0.7):
         """
-        Initializes the heuristic engine with a specific aggression threshold.
+        Initializes the logic engine with a specific alert threshold.
         
         Args:
-            aggression_threshold (float): Sensitivity to utilization spikes (0.0 to 1.0).
+            alert_threshold (float): Sensitivity to balance increases (0.0 to 1.0).
         """
-        self.aggression_threshold = aggression_threshold
+        self.alert_threshold = alert_threshold
 
     def evaluate(self, transaction: Dict[str, Any]) -> float:
         """
-        Evaluates a transaction for its impact on capital utilization.
+        Evaluates a transaction for its impact on account balance.
         
         Returns:
-            float: A veracity/aggression score where higher values trigger optimization alerts.
+            float: A score where higher values indicate the need for a payment alert.
         """
         amount = transaction.get("amount", 0)
         # Simplified scoring logic for portfolio demonstration

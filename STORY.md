@@ -1,9 +1,7 @@
-# The Story Behind CredStack
+# Project Background: CredStack
 
-*A Fixer's Log*
+I developed CredStack to address a common problem with automated financial tools: cloud dependency. Many tools that track spending require uploading sensitive account information to external servers.
 
-My friend kept getting crushed by credit card interest. Not because she was irresponsible—because the payments always came due at the worst times. A big purchase here, a forgotten autopay there. The banks loved it. She hated it.
+CredStack runs entirely locally. It was originally built to help a friend manage credit card interest. By monitoring account patterns and flagging potential balance increases before payment dates, the tool helped her avoid interest charges for the first time in several years.
 
-I built CredStack to run locally on her machine, watching her accounts without sending data anywhere. It learned her patterns and started flagging potential utilization spikes before they happened. Last month, she paid zero interest for the first time in three years.
-
-The technical challenge wasn't building another cloud dashboard—it was making something that worked entirely offline, with heuristics tunable to individual behavior patterns. CredStack is what emerged.
+The goal was to create a functional dashboard that operates offline, using simple rules that can be adjusted to fit individual needs.

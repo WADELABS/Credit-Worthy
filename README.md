@@ -1,53 +1,47 @@
-# CredStack (Credit-Worthy)
+# CredStack
 
-[![CI](https://github.com/WADELABS/credstack/actions/workflows/ci.yml/badge.svg)](https://github.com/WADELABS/credstack/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+A local tool for monitoring credit utilization. CredStack helps you:
+- Track credit usage across multiple accounts.
+- Use rule-based logic to plan payments.
+- Schedule automated reminders for account checks.
 
-A privacy-first credit utilization optimizer that runs locally. CredStack helps you:
-- Track credit usage across accounts
-- Apply custom heuristics to optimize payments
-- Schedule automated recommendations
+## Purpose
 
-## Why CredStack?
+CredStack is designed to run locally, keeping financial data on your machine rather than in the cloud.
 
-Most credit tools upload your data to the cloud. CredStack keeps everything on your machine. Your financial data never leaves your control.
-
-## Quick Start
+## Installation
 
 ```bash
-# Clone and run
 git clone https://github.com/WADELABS/credstack.git
 cd credstack
 pip install -r requirements.txt
 python app.py
 ```
 
-Then open `http://localhost:5000`
+Open `http://localhost:5000` to view the tool.
 
-## How It Works
+## Technical Details
 
-CredStack uses three configurable heuristics:
-- **Proactive Signal**: Detects upcoming utilization spikes
-- **Aggression Threshold**: Controls how aggressively to optimize
-- **Liability Neutralization**: Identifies high-interest targets
+CredStack uses configurable logic for:
+- **Usage Monitoring**: Tracks balance relative to limits.
+- **Alert Thresholds**: Configurable triggers for utilization spikes.
+- **Payment Prioritization**: Identifies accounts that need attention based on interest or balance.
 
-Configure them in `config.yaml`:
+Configuration is handled in `config.yaml`:
 ```yaml
-heuristics:
-  proactive_signal: 0.8
-  aggression_threshold: 0.6
-  liability_neutralization: true
+logic:
+  alert_threshold: 0.8
+  min_payment_alert: true
 ```
 
-## Tech Stack
-- Python/Flask backend
-- SQLite for local storage
-- HTML/CSS/JS frontend (vanilla)
-- Built-in scheduler for automated checks
+## Stack
+- Python/Flask
+- SQLite
+- HTML/CSS/JS
 
-## Tests
+## Testing
 ```bash
-pytest tests/ --cov=src
+pytest tests/
 ```
 
 ## License
