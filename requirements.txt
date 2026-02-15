@@ -1,0 +1,6 @@
+flask
+python-dotenv
+questionary
+colorama
+click
+python-dateutil

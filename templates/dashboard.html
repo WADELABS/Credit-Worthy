@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CredStack</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container fade-in">
+        <header>
+            <div class="logo">CredStack</div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <span style="opacity: 0.7;">{{ session['user_email'] }}</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</a>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="glass flash-message" data-category="{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="dashboard-grid">
+            <!-- Health Score -->
+            <div class="glass card" style="text-align: center;">
+                <h3 class="card-title">Credit Health</h3>
+                <div class="score-circle">
+                    <span class="score-value">{{ health_score }}</span>
+                    <span class="score-label">Estimated</span>
+                </div>
+                <p style="font-size: 0.9rem; margin-top: 1rem;">
+                    {% if health_score >= 740 %}
+                    <span style="color: var(--success);">Excellent!</span> Keep it up.
+                    {% elif health_score >= 670 %}
+                    <span style="color: var(--warning);">Good.</span> Room to grow.
+                    {% else %}
+                    <span style="color: var(--danger);">Needs work.</span> Automate more!
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Upcoming Tasks -->
+            <div class="glass card">
+                <h3 class="card-title">Upcoming Tasks</h3>
+                <div style="max-height: 250px; overflow-y: auto;">
+                    {% if reminders %}
+                    {% for reminder in reminders %}
+                    <div class="list-item">
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">{{ reminder.message }}</div>
+                            <div style="font-size: 0.75rem; opacity: 0.6;">{{ reminder.reminder_date }}</div>
+                        </div>
+                        <button onclick="completeReminder(this.dataset.id, this)" data-id="{{ reminder.id }}"
+                            class="btn-outline btn-done">Done</button>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p style="opacity: 0.5; text-align: center; margin-top: 2rem;">No tasks for the next 7 days.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Automation Status -->
+            <div class="glass card">
+                <h3 class="card-title">Active Automations</h3>
+                <div>
+                    {% for auto in automations %}
+                    <div class="list-item">
+                        <div style="font-size: 0.9rem;">{{ auto.automation_type.replace('_', ' ').title() }}</div>
+                        <form action="{{ url_for('toggle_automation', auto_id=auto.id) }}" method="POST">
+                            <button type="submit" class="badge" data-active="{{ '1' if auto.is_active else '0' }}"
+                                style="border: none; cursor: pointer;">
+                                {{ 'Active' if auto.is_active else 'Paused' }}
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+            <!-- Accounts Section -->
+            <div class="glass card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 class="card-title">Linked Accounts</h3>
+                    <button onclick="document.getElementById('add-account-modal').style.display = 'block'"
+                        class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">+ Add Account</button>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--glass-border); text-align: left; opacity: 0.6;">
+                            <th style="padding: 1rem 0.5rem;">Name</th>
+                            <th style="padding: 1rem 0.5rem;">Balance</th>
+                            <th style="padding: 1rem 0.5rem;">Utilization</th>
+                            <th style="padding: 1rem 0.5rem;">Due Date</th>
+                            <th style="padding: 1rem 0.5rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in accounts %}
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <td style="padding: 1rem 0.5rem;">
+                                <div style="font-weight: 600;">{{ account.name }}</div>
+                                <div style="font-size: 0.7rem; opacity: 0.6;">{{ account.account_type.title() }}</div>
+                            </td>
+                            <td style="padding: 1rem 0.5rem;">${{ "{:,.2f}".format(account.balance) }}</td>
+                            <td style="padding: 1rem 0.5rem;">
+                                {% if account.credit_limit %}
+                                {% set util = (account.balance / account.credit_limit * 100) %}
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div
+                                        style="flex-grow: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; width: 60px;">
+                                        <div class="util-bar-fill" data-util="{{ util }}" style="width: 0%;"></div>
+                                    </div>
+                                    <span>{{ util | round(1) }}%</span>
+                                </div>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td style="padding: 1rem 0.5rem;">{{ account.due_date if account.due_date else 'N/A' }}</td>
+                            <td style="padding: 1rem 0.5rem;">
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <form action="{{ url_for('update_balance', account_id=account.id) }}" method="POST"
+                                        style="display: flex; gap: 0.2rem;">
+                                        <input type="number" name="balance" step="0.01"
+                                            style="width: 80px; padding: 0.3rem;" placeholder="New Bal">
+                                        <button type="submit" class="btn btn-outline"
+                                            style="padding: 0.3rem 0.5rem; font-size: 0.7rem;">Update</button>
+                                    </form>
+                                    <form action="{{ url_for('delete_account', account_id=account.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-outline"
+                                            style="color: var(--danger); padding: 0.3rem 0.5rem; font-size: 0.7rem;">&times;</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if not accounts %}
+                <p style="text-align: center; margin-top: 3rem; opacity: 0.5;">No accounts added yet. Start by adding
+                    your first credit card.</p>
+                {% endif %}
+            </div>
+
+            <!-- Disputes -->
+            <div class="glass card">
+                <h3 class="card-title">Dispute Tracker</h3>
+                <div style="margin-bottom: 1.5rem;">
+                    <form action="{{ url_for('add_dispute') }}" method="POST">
+                        <div class="form-group">
+                            <select name="bureau" required>
+                                <option value="">Select Bureau</option>
+                                <option value="Experian">Experian</option>
+                                <option value="Equifax">Equifax</option>
+                                <option value="TransUnion">TransUnion</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="account_name" placeholder="Account Name (e.g. Chase)" required>
+                        </div>
+                        <button type="submit" class="btn btn-outline" style="width: 100%; font-size: 0.8rem;">Start
+                            Tracking Dispute</button>
+                    </form>
+                </div>
+
+                <div style="max-height: 300px; overflow-y: auto;">
+                    {% for dispute in disputes %}
+                    <div class="list-item" style="flex-direction: column; align-items: flex-start;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">{{ dispute.account_name }}</span>
+                            <span class="badge badge-warning">{{ dispute.status.replace('_', ' ').title() }}</span>
+                        </div>
+                        <div style="font-size: 0.75rem; opacity: 0.6;">Bureau: {{ dispute.bureau }}</div>
+                        <div style="font-size: 0.75rem; opacity: 0.6;">Next Follow-up: {{ dispute.follow_up_date }}
+                        </div>
+                        <div style="margin-top: 0.5rem; width: 100%;">
+                            <form action="{{ url_for('update_dispute', dispute_id=dispute.id) }}" method="POST">
+                                <select name="status" onchange="this.form.submit()"
+                                    style="font-size: 0.7rem; padding: 0.2rem;">
+                                    <option value="pending" {{ 'selected' if dispute.status=='pending' }}>Pending
+                                    </option>
+                                    <option value="in_progress" {{ 'selected' if dispute.status=='in_progress' }}>In
+                                        Progress</option>
+                                    <option value="resolved" {{ 'selected' if dispute.status=='resolved' }}>Resolved
+                                    </option>
+                                    <option value="rejected" {{ 'selected' if dispute.status=='rejected' }}>Rejected
+                                    </option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Account Modal (Hidden by default) -->
+        <div id="add-account-modal" class="glass"
+            style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; padding: 2rem; min-width: 400px; box-shadow: 0 0 100px rgba(0,0,0,0.8);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>Add New Account</h3>
+                <button onclick="this.parentElement.parentElement.style.display = 'none'"
+                    style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form action="{{ url_for('add_account') }}" method="POST">
+                <div class="form-group">
+                    <label>Account Name</label>
+                    <input type="text" name="name" placeholder="e.g. Chase Sapphire" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Type</label>
+                    <select name="account_type">
+                        <option value="credit_card">Credit Card</option>
+                        <option value="loan">Loan</option>
+                        <option value="collection">Collection</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Current Balance</label>
+                        <input type="number" name="balance" step="0.01" value="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Credit Limit</label>
+                        <input type="number" name="credit_limit" step="0.01">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Statement Day (1-31)</label>
+                        <input type="number" name="statement_date" min="1" max="31">
+                    </div>
+                    <div class="form-group">
+                        <label>Due Day (1-31)</label>
+                        <input type="number" name="due_date" min="1" max="31">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Add
+                    Account</button>
+            </form>
+        </div>
+
+        <script>
+            // Initialize progress bars
+            document.querySelectorAll('.util-bar-fill').forEach(bar => {
+                const util = parseFloat(bar.dataset.util);
+                bar.style.width = util + '%';
+                if (util > 30) bar.classList.add('bg-danger');
+                else bar.classList.add('bg-success');
+            });
+
+            function completeReminder(id, btn) {
+                fetch('/reminders/' + id + '/complete', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const row = btn.closest('.list-item');
+                            row.style.opacity = '0.3';
+                            row.style.textDecoration = 'line-through';
+                            btn.remove();
+                        }
+                    });
+            }
+        </script>
+    </div>
+</body>
+
+</html>

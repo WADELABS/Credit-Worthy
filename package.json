@@ -1,0 +1,18 @@
+{
+  "name": "credstack-workers",
+  "version": "1.0.0",
+  "description": "Background workers for CredStack",
+  "main": "workers/node-worker.js",
+  "scripts": {
+    "start-sms": "node workers/sms-worker.js",
+    "start-email": "node workers/email-worker.js",
+    "start-dispute": "node workers/dispute-worker.js"
+  },
+  "dependencies": {
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.3.1",
+    "twilio": "^4.19.0",
+    "axios": "^1.5.0",
+    "sqlite3": "^5.1.6"
+  }
+}
