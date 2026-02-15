@@ -1,0 +1,29 @@
+# CredStack Automation Substrate Configuration
+# Phase 2: Precision Engineering Substrate
+
+automation:
+  # Aggression Thresholds for Utilization Management
+  utilization:
+    # Target percentage to stay below for maximum credit salience
+    target_maximum: 10.0
+    
+    # Threshold at which the system triggers urgent neutralization alerts
+    warning_threshold: 30.0
+    
+    # Buffer in days before statement close to execute neutralization of balances
+    neutralization_lead_time_days: 3
+
+  scheduling:
+    # Frequency for substrate health checks (seconds)
+    background_polling_interval: 3600
+    
+  privacy:
+    # Local data sovereignty configuration
+    storage_mode: local_sqlite
+    encryption_at_rest: false # Future implementation
+    cloud_sync_enabled: false
+
+user_interface:
+  # Aesthetic overrides
+  theme: wadelabs_dark
+  high_fidelity_animations: true

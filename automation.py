@@ -6,6 +6,25 @@ Core logic for calculating statement dates and generating reminders.
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import database
+import yaml
+import os
+
+def load_config():
+    config_path = os.path.join(os.path.dirname(__file__), 'config.yaml')
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            return yaml.safe_load(f)
+    return {
+        'automation': {
+            'utilization': {
+                'target_maximum': 10.0,
+                'warning_threshold': 30.0,
+                'neutralization_lead_time_days': 3
+            }
+        }
+    }
+
+config = load_config()
 
 def calculate_next_date(day_of_month, months_ahead=0):
     """Calculate the next occurrence of a specific day of the month"""
@@ -28,10 +47,12 @@ def generate_statement_alert(user_id, account_id, account_name, statement_day):
     """Create a reminder for local statement closing"""
     conn = database.get_db()
     
-    # Alert 3 days BEFORE statement closes
-    alert_date = calculate_next_date(statement_day) - timedelta(days=3)
+    # Use lead time from config
+    lead_time = config['automation']['utilization']['neutralization_lead_time_days']
+    alert_date = calculate_next_date(statement_day) - timedelta(days=lead_time)
     
-    message = f"Alert: {account_name} statement closes in 3 days. Pay down balance for low utilization!"
+    target_util = config['automation']['utilization']['target_maximum']
+    message = f"Alert: {account_name} statement closes in {lead_time} days. Neutralize balance to <{target_util}% for maximum salience."
     
     # Check if exists
     exists = conn.execute('''

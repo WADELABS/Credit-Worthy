@@ -4,3 +4,4 @@ questionary
 colorama
 click
 python-dateutil
+PyYAML
