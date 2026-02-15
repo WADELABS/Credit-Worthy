@@ -5,3 +5,11 @@ colorama
 click
 python-dateutil
 PyYAML
+flask-login
+flask-wtf
+bcrypt
+pyjwt
+flask-limiter
+pytest
+pytest-cov
+pytest-mock

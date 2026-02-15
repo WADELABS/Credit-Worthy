@@ -23,15 +23,30 @@
             </p>
 
             <div class="glass card" style="max-width: 400px; margin: 0 auto; padding: 2rem;">
-                <h3 style="margin-bottom: 1.5rem;">Ready to automate?</h3>
+                <h3 style="margin-bottom: 1.5rem;">Login to your account</h3>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" style="margin-bottom: 1rem; padding: 0.75rem; border-radius: 0.5rem; {% if category == 'error' %}background: rgba(239, 68, 68, 0.1); color: #ef4444;{% else %}background: rgba(34, 197, 94, 0.1); color: #22c55e;{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
                 <form action="{{ url_for('login') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="form-group">
-                        <input type="email" name="email" placeholder="Enter your email" required>
+                        <input type="email" name="email" placeholder="Email address" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Enter Dashboard</button>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Log In</button>
                 </form>
-                <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.6;">
-                    No password required for this demo. Just enter an email.
+                <p style="font-size: 0.9rem; margin-top: 1.5rem; text-align: center;">
+                    Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--primary); text-decoration: none;">Register here</a>
                 </p>
             </div>
 

@@ -51,11 +51,17 @@ def create_database():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
+            password_hash TEXT,
             phone TEXT,
             name TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             notification_preference TEXT DEFAULT 'email',
-            automation_level TEXT DEFAULT 'basic'
+            automation_level TEXT DEFAULT 'basic',
+            failed_login_attempts INTEGER DEFAULT 0,
+            account_locked_until TIMESTAMP,
+            last_login TIMESTAMP,
+            api_token TEXT,
+            api_token_created TIMESTAMP
         )
     ''')
     
@@ -111,9 +117,14 @@ def create_database():
             user_id INTEGER NOT NULL,
             bureau TEXT NOT NULL,
             account_name TEXT,
+            creditor TEXT,
+            reason TEXT,
             dispute_date DATE NOT NULL,
+            date_filed DATE,
             follow_up_date DATE,
+            date_resolved DATE,
             status TEXT DEFAULT 'pending',
+            outcome TEXT,
             notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
