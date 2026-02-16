@@ -1,0 +1,27 @@
+[run]
+source = 
+    app
+    auth
+    automation
+    database
+omit = 
+    */tests/*
+    */venv/*
+    */__pycache__/*
+    */migrations/*
+    setup.py
+    workers/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if __name__ == "__main__":
+    @abstractmethod
+precision = 2
+
+[html]
+directory = htmlcov

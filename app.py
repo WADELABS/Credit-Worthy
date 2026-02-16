@@ -26,12 +26,14 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev-key-change-this')
 # Enable CSRF protection
 csrf = CSRFProtect(app)
 
-# Rate limiting
+# Rate limiting - can be disabled in testing
+rate_limit_enabled = os.getenv('RATELIMIT_ENABLED', 'true').lower() != 'false'
 limiter = Limiter(
     app=app,
     key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://"
+    default_limits=["200 per day", "50 per hour"] if rate_limit_enabled else [],
+    storage_uri="memory://",
+    enabled=rate_limit_enabled
 )
 
 # Security headers
