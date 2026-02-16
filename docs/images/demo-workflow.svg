@@ -1,0 +1,92 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgb(59,130,246);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(147,51,234);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#0f172a"/>
+  
+  <!-- Title -->
+  <text x="400" y="50" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle">
+    CredStack Workflow Demo
+  </text>
+  
+  <!-- Step 1 -->
+  <rect x="50" y="100" width="700" height="80" rx="8" fill="#1e293b"/>
+  <circle cx="100" cy="140" r="20" fill="url(#grad3)"/>
+  <text x="110" y="148" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    1
+  </text>
+  <text x="140" y="135" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    Login &amp; View Dashboard
+  </text>
+  <text x="140" y="160" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Secure authentication with instant credit overview
+  </text>
+  
+  <!-- Arrow -->
+  <polygon points="400,185 395,195 405,195" fill="#64748b"/>
+  <line x1="400" y1="180" x2="400" y2="195" stroke="#64748b" stroke-width="2"/>
+  
+  <!-- Step 2 -->
+  <rect x="50" y="200" width="700" height="80" rx="8" fill="#1e293b"/>
+  <circle cx="100" cy="240" r="20" fill="url(#grad3)"/>
+  <text x="110" y="248" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    2
+  </text>
+  <text x="140" y="235" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    Add Credit Accounts
+  </text>
+  <text x="140" y="260" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Track credit cards, loans, and monitor utilization
+  </text>
+  
+  <!-- Arrow -->
+  <polygon points="400,285 395,295 405,295" fill="#64748b"/>
+  <line x1="400" y1="280" x2="400" y2="295" stroke="#64748b" stroke-width="2"/>
+  
+  <!-- Step 3 -->
+  <rect x="50" y="300" width="700" height="80" rx="8" fill="#1e293b"/>
+  <circle cx="100" cy="340" r="20" fill="url(#grad3)"/>
+  <text x="110" y="348" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    3
+  </text>
+  <text x="140" y="335" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    Configure Automation
+  </text>
+  <text x="140" y="360" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Set alerts for utilization, statements, and disputes
+  </text>
+  
+  <!-- Arrow -->
+  <polygon points="400,385 395,395 405,395" fill="#64748b"/>
+  <line x1="400" y1="380" x2="400" y2="395" stroke="#64748b" stroke-width="2"/>
+  
+  <!-- Step 4 -->
+  <rect x="50" y="400" width="700" height="80" rx="8" fill="#1e293b"/>
+  <circle cx="100" cy="440" r="20" fill="url(#grad3)"/>
+  <text x="110" y="448" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">
+    4
+  </text>
+  <text x="140" y="435" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    Monitor &amp; Optimize
+  </text>
+  <text x="140" y="460" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Real-time insights and automated credit health management
+  </text>
+  
+  <!-- Success indicator -->
+  <circle cx="400" cy="540" r="30" fill="#22c55e" opacity="0.2"/>
+  <circle cx="400" cy="540" r="20" fill="#22c55e"/>
+  <text x="400" y="548" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle">
+    ✓
+  </text>
+  
+  <!-- Footer text -->
+  <text x="400" y="585" font-family="Arial, sans-serif" font-size="14" fill="#64748b" text-anchor="middle">
+    Demo GIF Placeholder • CredStack
+  </text>
+</svg>
