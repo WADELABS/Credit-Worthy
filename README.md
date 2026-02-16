@@ -235,6 +235,8 @@ SENDGRID_API_KEY=<your-sendgrid-key>
 ## 📖 Documentation
 
 - **[API Documentation](docs/API.md)** - Complete REST API reference
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Cloud deployment instructions
+- **[Workflows Guide](docs/WORKFLOWS.md)** - User workflows and best practices
 - **[Contributing Guide](CONTRIBUTING.md)** - Development guidelines
 - **[Changelog](CHANGELOG.md)** - Version history and updates
 
