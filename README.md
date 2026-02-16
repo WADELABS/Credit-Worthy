@@ -151,6 +151,64 @@ CredStack operates as an active automation substrate that employs heuristic logi
 3. Enter your email, password, and name
 4. You'll be automatically logged in to your dashboard
 
+## 🚀 Cloud Deployment
+
+Deploy CredStack to your preferred cloud platform for 24/7 access:
+
+### Deploy to Render (Recommended)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+1. Click the "Deploy to Render" button above
+2. Connect your GitHub repository
+3. Render will automatically detect `render.yaml`
+4. Set environment variables (SECRET_KEY, JWT_SECRET_KEY)
+5. Deploy! Your app will be live in minutes
+
+**Note**: The free tier includes 750 hours/month and persistent disk storage for SQLite.
+
+### Deploy to Heroku
+
+1. Install the Heroku CLI
+2. Create a new Heroku app:
+   ```bash
+   heroku create your-app-name
+   ```
+3. Set environment variables:
+   ```bash
+   heroku config:set SECRET_KEY=$(python -c 'import secrets; print(secrets.token_hex(32))')
+   heroku config:set JWT_SECRET_KEY=$(python -c 'import secrets; print(secrets.token_hex(32))')
+   heroku config:set FLASK_ENV=production
+   ```
+4. Deploy:
+   ```bash
+   git push heroku main
+   ```
+
+### Deploy to Railway
+
+1. Install Railway CLI: `npm i -g @railway/cli`
+2. Login: `railway login`
+3. Initialize project: `railway init`
+4. Deploy: `railway up`
+
+### Environment Variables for Production
+
+Required environment variables for cloud deployment:
+```env
+SECRET_KEY=<generate-random-32-char-string>
+JWT_SECRET_KEY=<generate-different-random-string>
+FLASK_ENV=production
+DATABASE_URL=sqlite:///database/credstack.db
+```
+
+Optional (for notifications):
+```env
+TWILIO_ACCOUNT_SID=<your-twilio-sid>
+TWILIO_AUTH_TOKEN=<your-twilio-token>
+SENDGRID_API_KEY=<your-sendgrid-key>
+```
+
 ## 📋 Features
 
 ### Dashboard
