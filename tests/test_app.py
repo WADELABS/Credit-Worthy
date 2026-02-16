@@ -68,6 +68,7 @@ class TestCredStackApp(unittest.TestCase):
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Dashboard', response.data)
+        self.assertIn(b'test@example.com', response.data)
 
     def test_add_account(self):
         """Verify account creation"""
