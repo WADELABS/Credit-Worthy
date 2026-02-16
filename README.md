@@ -10,6 +10,48 @@
 
 CredStack is a precision-engineered, production-ready platform for automated credit optimization. Moving beyond simple tracking, it provides enterprise-grade authentication, comprehensive API access, and robust automation to maximize your credit health while maintaining absolute data sovereignty.
 
+## 🌐 Live Demo
+
+> **[View Live Demo](https://credstack-demo.onrender.com)** *(coming soon)*
+
+Experience CredStack's powerful features with a live demo deployment. Test the full functionality including credit monitoring, automation rules, and real-time analytics.
+
+## 🎥 Demo
+
+Get a quick overview of CredStack's workflow:
+
+<p align="center">
+  <img src="docs/images/demo-workflow.svg" alt="CredStack Demo Workflow" width="600">
+</p>
+
+**Quick Workflow:**
+1. 🔐 **Login** - Secure authentication with your credentials
+2. 💳 **Add Accounts** - Track credit cards and monitor utilization
+3. ⚙️ **Configure Automation** - Set up alerts and reminders
+4. 📊 **Monitor & Optimize** - Real-time credit health insights
+
+## 📸 Screenshots
+
+### Dashboard Overview
+<img src="docs/images/dashboard-overview.svg" alt="CredStack Dashboard showing credit score, utilization, and recent activity" width="800">
+
+*Main dashboard displaying your credit health score, current utilization, active accounts, recent activity, and upcoming reminders.*
+
+### Credit Monitoring
+<img src="docs/images/credit-monitoring.svg" alt="Credit monitoring interface with detailed account information" width="800">
+
+*Comprehensive view of all credit accounts with real-time balance tracking, credit limits, and utilization percentages.*
+
+### Automation Settings
+<img src="docs/images/automation-settings.svg" alt="Automation configuration panel with customizable rules" width="800">
+
+*Configure intelligent automation rules for utilization alerts, statement reminders, and dispute follow-ups.*
+
+### Reports & Analytics
+<img src="docs/images/reports-view.svg" alt="Analytics dashboard with credit score trends and key metrics" width="800">
+
+*Visualize your credit score trends over time with detailed analytics and exportable reports.*
+
 ## ✨ What's New
 
 ### 🔐 Enterprise Security
@@ -148,8 +190,10 @@ CredStack operates as an active automation substrate that employs heuristic logi
 ## 📖 Documentation
 
 - **[API Documentation](docs/API.md)** - Complete REST API reference
+- **[Deployment Guide](DEPLOYMENT.md)** - Production deployment instructions
 - **[Contributing Guide](CONTRIBUTING.md)** - Development guidelines
 - **[Changelog](CHANGELOG.md)** - Version history and updates
+- **[Screenshots](docs/images/)** - Visual documentation and demo assets
 
 ## 🧪 Testing
 
@@ -265,6 +309,64 @@ automation:
     neutralization_lead_time_days: 3
 ```
 
+## 🚀 Deployment
+
+Ready to deploy CredStack to production? We support multiple hosting platforms with easy one-click deployments.
+
+### Quick Deploy Options
+
+#### Deploy to Render (Recommended)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+Render offers a generous free tier with persistent storage - perfect for CredStack.
+
+#### Deploy to Heroku
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+One-click deployment to Heroku with automatic configuration.
+
+#### Deploy to Railway
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
+
+Modern deployment platform with excellent developer experience.
+
+### Deployment Requirements
+
+**Minimum Specifications:**
+- **Memory**: 512MB RAM (1GB recommended)
+- **Storage**: 1GB persistent disk for database
+- **Python**: 3.8 or higher
+
+**Required Environment Variables:**
+```env
+SECRET_KEY=your-secret-key-here
+JWT_SECRET_KEY=your-jwt-secret-here
+FLASK_ENV=production
+DATABASE_URL=sqlite:///database/credstack.db
+```
+
+### Platform-Specific Guides
+
+For detailed deployment instructions including environment setup, database configuration, and troubleshooting:
+
+📖 **[Complete Deployment Guide](DEPLOYMENT.md)** - Step-by-step instructions for:
+- Render (recommended)
+- Heroku
+- Railway
+- Docker
+- Custom VPS/server
+
+### Post-Deployment Checklist
+
+After deploying, verify:
+- ✅ Application is accessible via HTTPS
+- ✅ Can register and login successfully
+- ✅ Database is persisting data
+- ✅ All core features are functional
+- ✅ Environment variables are properly set
+
+**Need Help?** Check our [Deployment Guide](DEPLOYMENT.md) or open an issue.
+
 ## 🔐 API Usage
 
 ### Quick Example
@@ -336,7 +438,9 @@ Do not open public issues for security vulnerabilities.
 - ✅ **Comprehensive** REST API
 - ✅ **70+ tests** with CI/CD pipeline
 - ✅ **Complete** documentation
-- 🚧 **In progress**: Visual documentation (screenshots, demo video)
+- ✅ **Visual documentation** with screenshots and demo
+- ✅ **Deployment ready** with multi-platform support
+- 🚧 **In progress**: Live demo deployment
 
 ## 🙏 Acknowledgments
 
