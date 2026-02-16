@@ -1,0 +1,103 @@
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#0f172a"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1200" height="80" fill="#1e293b"/>
+  <text x="40" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">
+    Automation Settings
+  </text>
+  
+  <!-- Main Content Area -->
+  <rect x="40" y="120" width="1120" height="640" rx="12" fill="#1e293b" opacity="0.9"/>
+  
+  <!-- Title -->
+  <text x="60" y="170" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="white">
+    Configure Automation Rules
+  </text>
+  
+  <!-- Section 1: Utilization Alerts -->
+  <rect x="60" y="200" width="1080" height="140" rx="8" fill="#334155"/>
+  <text x="80" y="235" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    📊 Utilization Alerts
+  </text>
+  <text x="80" y="260" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Get notified when credit utilization exceeds threshold
+  </text>
+  
+  <!-- Toggle Switch (On) -->
+  <rect x="1000" y="220" width="60" height="30" rx="15" fill="#22c55e"/>
+  <circle cx="1045" cy="235" r="12" fill="white"/>
+  
+  <!-- Slider -->
+  <text x="80" y="295" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Warning Threshold:
+  </text>
+  <rect x="220" y="280" width="400" height="8" rx="4" fill="#475569"/>
+  <rect x="220" y="280" width="120" height="8" rx="4" fill="#3b82f6"/>
+  <circle cx="340" cy="284" r="12" fill="#3b82f6"/>
+  <text x="420" y="295" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#3b82f6">
+    30%
+  </text>
+  
+  <!-- Section 2: Statement Reminders -->
+  <rect x="60" y="360" width="1080" height="140" rx="8" fill="#334155"/>
+  <text x="80" y="395" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🔔 Statement Close Reminders
+  </text>
+  <text x="80" y="420" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Receive alerts before statement close dates
+  </text>
+  
+  <!-- Toggle Switch (On) -->
+  <rect x="1000" y="380" width="60" height="30" rx="15" fill="#22c55e"/>
+  <circle cx="1045" cy="395" r="12" fill="white"/>
+  
+  <!-- Days input -->
+  <text x="80" y="455" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Alert me
+  </text>
+  <rect x="160" y="440" width="60" height="30" rx="4" fill="#475569"/>
+  <text x="180" y="462" font-family="Arial, sans-serif" font-size="16" fill="white">
+    3
+  </text>
+  <text x="230" y="455" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    days before statement closes
+  </text>
+  
+  <!-- Section 3: Dispute Follow-ups -->
+  <rect x="60" y="520" width="1080" height="140" rx="8" fill="#334155"/>
+  <text x="80" y="555" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    📝 Dispute Follow-ups
+  </text>
+  <text x="80" y="580" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Automatic reminders for pending disputes
+  </text>
+  
+  <!-- Toggle Switch (On) -->
+  <rect x="1000" y="540" width="60" height="30" rx="15" fill="#22c55e"/>
+  <circle cx="1045" cy="555" r="12" fill="white"/>
+  
+  <!-- Follow-up frequency -->
+  <text x="80" y="615" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Check status every
+  </text>
+  <rect x="230" y="600" width="70" height="30" rx="4" fill="#475569"/>
+  <text x="252" y="622" font-family="Arial, sans-serif" font-size="16" fill="white">
+    30
+  </text>
+  <text x="310" y="615" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    days
+  </text>
+  
+  <!-- Save Button -->
+  <rect x="500" y="700" width="200" height="45" rx="8" fill="#3b82f6"/>
+  <text x="560" y="730" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">
+    Save Settings
+  </text>
+  
+  <!-- Watermark -->
+  <text x="1050" y="785" font-family="Arial, sans-serif" font-size="12" fill="#475569">
+    CredStack • Screenshot
+  </text>
+</svg>

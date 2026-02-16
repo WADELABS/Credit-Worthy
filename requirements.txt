@@ -13,3 +13,4 @@ flask-limiter
 pytest
 pytest-cov
 pytest-mock
+gunicorn
