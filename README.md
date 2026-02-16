@@ -5,8 +5,42 @@
 [![CI/CD](https://github.com/WADELABS/Credit-Worthy/actions/workflows/ci.yml/badge.svg)](https://github.com/WADELABS/Credit-Worthy/actions)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Deploy to Render](https://img.shields.io/badge/deploy-render-5B48E8.svg)](https://render.com)
 
 CredStack is a precision-engineered, production-ready platform for automated credit optimization. Moving beyond simple tracking, it provides enterprise-grade authentication, comprehensive API access, and robust automation to maximize your credit health while maintaining absolute data sovereignty.
+
+## 🎬 Live Demo
+
+**Try CredStack without installing!**
+
+The application is designed to run locally for maximum privacy, but you can deploy your own instance to cloud platforms like Render, Heroku, or Railway.
+
+### Demo Credentials (for local setup)
+```
+Email: demo@credstack.com
+Password: demo123
+```
+
+## 📸 Screenshots
+
+### Landing Page
+![CredStack Landing Page](https://github.com/user-attachments/assets/79721434-bf1a-4dd0-80aa-096b92626c6e)
+*Beautiful glassmorphism design with secure authentication*
+
+### Main Dashboard
+![CredStack Dashboard](https://github.com/user-attachments/assets/67a6ac64-75a3-4b94-adc1-9d7140978753)
+*Real-time credit health monitoring with automation management*
+
+### Registration
+![User Registration](https://github.com/user-attachments/assets/0460de11-4b8f-436a-9cca-8cc5a52e5e6c)
+*Secure account creation with password validation*
+
+### Key Features Shown
+- **Credit Health Score**: Real-time calculation based on utilization (780 score in demo)
+- **Linked Accounts**: Track multiple credit cards with balance and utilization monitoring
+- **Active Automations**: 8 pre-configured automation rules for credit optimization
+- **Upcoming Tasks**: Smart reminders for important credit-related actions
+- **Dispute Tracker**: Built-in dispute management for credit bureau issues
 
 ## ✨ What's New
 
@@ -103,6 +137,64 @@ CredStack operates as an active automation substrate that employs heuristic logi
 2. Click "Register here" to create an account
 3. Enter your email, password, and name
 4. You'll be automatically logged in to your dashboard
+
+## 🚀 Cloud Deployment
+
+Deploy CredStack to your preferred cloud platform for 24/7 access:
+
+### Deploy to Render (Recommended)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+1. Click the "Deploy to Render" button above
+2. Connect your GitHub repository
+3. Render will automatically detect `render.yaml`
+4. Set environment variables (SECRET_KEY, JWT_SECRET_KEY)
+5. Deploy! Your app will be live in minutes
+
+**Note**: The free tier includes 750 hours/month and persistent disk storage for SQLite.
+
+### Deploy to Heroku
+
+1. Install the Heroku CLI
+2. Create a new Heroku app:
+   ```bash
+   heroku create your-app-name
+   ```
+3. Set environment variables:
+   ```bash
+   heroku config:set SECRET_KEY=$(python -c 'import secrets; print(secrets.token_hex(32))')
+   heroku config:set JWT_SECRET_KEY=$(python -c 'import secrets; print(secrets.token_hex(32))')
+   heroku config:set FLASK_ENV=production
+   ```
+4. Deploy:
+   ```bash
+   git push heroku main
+   ```
+
+### Deploy to Railway
+
+1. Install Railway CLI: `npm i -g @railway/cli`
+2. Login: `railway login`
+3. Initialize project: `railway init`
+4. Deploy: `railway up`
+
+### Environment Variables for Production
+
+Required environment variables for cloud deployment:
+```env
+SECRET_KEY=<generate-random-32-char-string>
+JWT_SECRET_KEY=<generate-different-random-string>
+FLASK_ENV=production
+DATABASE_URL=sqlite:///database/credstack.db
+```
+
+Optional (for notifications):
+```env
+TWILIO_ACCOUNT_SID=<your-twilio-sid>
+TWILIO_AUTH_TOKEN=<your-twilio-token>
+SENDGRID_API_KEY=<your-sendgrid-key>
+```
 
 ## 📋 Features
 
@@ -268,7 +360,8 @@ Do not open public issues for security vulnerabilities.
 - ✅ **Comprehensive** REST API
 - ✅ **70+ tests** with CI/CD pipeline
 - ✅ **Complete** documentation
-- 🚧 **In progress**: Visual documentation (screenshots, demo video)
+- ✅ **Visual documentation** with screenshots and deployment guides
+- ✅ **Cloud deployment** ready (Render, Heroku, Railway)
 
 ## 🙏 Acknowledgments
 
