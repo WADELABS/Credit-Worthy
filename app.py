@@ -26,6 +26,12 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev-key-change-this')
 # Enable CSRF protection
 csrf = CSRFProtect(app)
 
+# Register API blueprint with Swagger documentation
+from api import api_bp
+app.register_blueprint(api_bp)
+# Exempt API routes from CSRF
+csrf.exempt(api_bp)
+
 # Rate limiting
 limiter = Limiter(
     app=app,
