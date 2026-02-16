@@ -192,14 +192,15 @@ start htmlcov/index.html  # Windows
 | **test_models.py** | 12 | Database models, relationships, constraints, data integrity |
 | **test_automation.py** | 3 | Automation engine, statement alerts, task execution |
 | **test_app.py** | 3 | Core application routes, session management |
+| **test_integration.py** | 2 | End-to-end user workflows, API integration testing |
 
-**Total: 101 tests** | **Coverage: 80.06%**
+**Total: 103 tests** | **Coverage: 80.80%**
 
 ### Coverage by Module
 
 - **automation.py**: 98% coverage
 - **auth.py**: 95% coverage
-- **app.py**: 76% coverage
+- **app.py**: 77% coverage
 - **database.py**: Fully covered
 
 ### Writing New Tests
