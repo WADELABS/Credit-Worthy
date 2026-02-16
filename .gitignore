@@ -24,3 +24,9 @@ htmlcov/
 # CredStack Specific
 screenshots/
 temp/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml

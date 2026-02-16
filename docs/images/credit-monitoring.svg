@@ -1,0 +1,106 @@
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:rgb(34,197,94);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgb(22,163,74);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#0f172a"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="1200" height="80" fill="#1e293b"/>
+  <text x="40" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">
+    Credit Monitoring
+  </text>
+  
+  <!-- Main Content Area -->
+  <rect x="40" y="120" width="1120" height="640" rx="12" fill="#1e293b" opacity="0.9"/>
+  
+  <!-- Title -->
+  <text x="60" y="170" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="white">
+    Account Overview
+  </text>
+  
+  <!-- Account 1: Credit Card -->
+  <rect x="60" y="200" width="1080" height="100" rx="8" fill="#334155"/>
+  <circle cx="100" cy="250" r="25" fill="url(#grad2)"/>
+  <text x="140" y="245" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    Chase Sapphire Reserve
+  </text>
+  <text x="140" y="270" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Credit Card • **4532
+  </text>
+  <text x="900" y="245" font-family="Arial, sans-serif" font-size="16" fill="white">
+    Balance: $450
+  </text>
+  <text x="900" y="270" font-family="Arial, sans-serif" font-size="14" fill="#22c55e">
+    Limit: $10,000 • 4.5% utilization
+  </text>
+  
+  <!-- Account 2: Credit Card -->
+  <rect x="60" y="320" width="1080" height="100" rx="8" fill="#334155"/>
+  <circle cx="100" cy="370" r="25" fill="url(#grad2)"/>
+  <text x="140" y="365" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    American Express Gold
+  </text>
+  <text x="140" y="390" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Credit Card • **1008
+  </text>
+  <text x="900" y="365" font-family="Arial, sans-serif" font-size="16" fill="white">
+    Balance: $1,200
+  </text>
+  <text x="900" y="390" font-family="Arial, sans-serif" font-size="14" fill="#22c55e">
+    Limit: $15,000 • 8% utilization
+  </text>
+  
+  <!-- Account 3: Credit Card -->
+  <rect x="60" y="440" width="1080" height="100" rx="8" fill="#334155"/>
+  <circle cx="100" cy="490" r="25" fill="url(#grad2)"/>
+  <text x="140" y="485" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    Discover it Cash Back
+  </text>
+  <text x="140" y="510" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">
+    Credit Card • **6789
+  </text>
+  <text x="900" y="485" font-family="Arial, sans-serif" font-size="16" fill="white">
+    Balance: $0
+  </text>
+  <text x="900" y="510" font-family="Arial, sans-serif" font-size="14" fill="#22c55e">
+    Limit: $5,000 • 0% utilization
+  </text>
+  
+  <!-- Summary Stats -->
+  <rect x="60" y="570" width="350" height="160" rx="8" fill="#334155"/>
+  <text x="80" y="605" font-family="Arial, sans-serif" font-size="16" fill="#94a3b8">
+    Total Credit Limit
+  </text>
+  <text x="80" y="640" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white">
+    $30,000
+  </text>
+  
+  <rect x="440" y="570" width="350" height="160" rx="8" fill="#334155"/>
+  <text x="460" y="605" font-family="Arial, sans-serif" font-size="16" fill="#94a3b8">
+    Total Balance
+  </text>
+  <text x="460" y="640" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white">
+    $1,650
+  </text>
+  
+  <rect x="820" y="570" width="320" height="160" rx="8" fill="#334155"/>
+  <text x="840" y="605" font-family="Arial, sans-serif" font-size="16" fill="#94a3b8">
+    Overall Utilization
+  </text>
+  <text x="840" y="640" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="#22c55e">
+    5.5%
+  </text>
+  <text x="840" y="670" font-family="Arial, sans-serif" font-size="14" fill="#22c55e">
+    ✓ Excellent
+  </text>
+  
+  <!-- Watermark -->
+  <text x="1050" y="785" font-family="Arial, sans-serif" font-size="12" fill="#475569">
+    CredStack • Screenshot
+  </text>
+</svg>

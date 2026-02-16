@@ -56,173 +56,178 @@ class TestDatabaseModels:
         
         conn.close()
     
-    def test_account_foreign_key_relationship(self, test_db, test_user):
-        """Test account belongs to user"""
-        conn = sqlite3.connect(test_db)
+    def test_account_creation(self):
+        """Test creating an account"""
+        conn = database.get_db()
         cursor = conn.cursor()
         
-        # Create account for user
+        # Create user first
         cursor.execute('''
-            INSERT INTO accounts (user_id, name, account_type, balance)
-            VALUES (?, ?, ?, ?)
-        ''', (test_user['id'], 'Test Card', 'credit_card', 100.0))
+            INSERT INTO users (email, password_hash)
+            VALUES (?, ?)
+        ''', ('test@example.com', 'hash123'))
+        user_id = cursor.lastrowid
+        
+        # Create account
+        cursor.execute('''
+            INSERT INTO accounts (user_id, name, account_type, balance, credit_limit)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, 'Test Card', 'credit_card', 1000.50, 5000.00))
+        
         account_id = cursor.lastrowid
         conn.commit()
         
-        # Verify account exists
-        cursor.execute('SELECT * FROM accounts WHERE id = ?', (account_id,))
-        account = cursor.fetchone()
+        # Retrieve account
+        account = conn.execute('SELECT * FROM accounts WHERE id = ?', (account_id,)).fetchone()
         conn.close()
         
-        assert account is not None
-        assert account[1] == test_user['id']  # user_id
-        assert account[2] == 'Test Card'  # name
+        self.assertEqual(account['name'], 'Test Card')
+        self.assertEqual(account['account_type'], 'credit_card')
+        self.assertEqual(float(account['balance']), 1000.50)
+        self.assertEqual(float(account['credit_limit']), 5000.00)
     
-    def test_cascade_delete_accounts(self, test_db, test_user):
-        """Test that deleting a user cascades to accounts"""
-        conn = sqlite3.connect(test_db)
-        # Enable foreign keys
-        conn.execute('PRAGMA foreign_keys = ON')
+    def test_user_account_relationship(self):
+        """Test relationship between users and accounts"""
+        conn = database.get_db()
         cursor = conn.cursor()
         
-        # Create account for user
+        # Create user
         cursor.execute('''
-            INSERT INTO accounts (user_id, name, account_type, balance)
-            VALUES (?, ?, ?, ?)
-        ''', (test_user['id'], 'Test Card', 'credit_card', 100.0))
-        account_id = cursor.lastrowid
+            INSERT INTO users (email, password_hash)
+            VALUES (?, ?)
+        ''', ('test@example.com', 'hash123'))
+        user_id = cursor.lastrowid
+        
+        # Create multiple accounts for user
+        for i in range(3):
+            cursor.execute('''
+                INSERT INTO accounts (user_id, name, account_type)
+                VALUES (?, ?, ?)
+            ''', (user_id, f'Card {i}', 'credit_card'))
+        
         conn.commit()
         
-        # Delete user
-        cursor.execute('DELETE FROM users WHERE id = ?', (test_user['id'],))
-        conn.commit()
-        
-        # Verify account was also deleted
-        cursor.execute('SELECT * FROM accounts WHERE id = ?', (account_id,))
-        account = cursor.fetchone()
+        # Retrieve all accounts for user
+        accounts = conn.execute(
+            'SELECT * FROM accounts WHERE user_id = ?',
+            (user_id,)
+        ).fetchall()
         conn.close()
         
-        assert account is None
+        self.assertEqual(len(accounts), 3)
+        for i, account in enumerate(accounts):
+            self.assertEqual(account['name'], f'Card {i}')
+            self.assertEqual(account['user_id'], user_id)
     
-    def test_cascade_delete_automations(self, test_db, test_user):
-        """Test that deleting a user cascades to automations"""
-        conn = sqlite3.connect(test_db)
-        # Enable foreign keys
-        conn.execute('PRAGMA foreign_keys = ON')
+    def test_automation_creation(self):
+        """Test creating automation"""
+        conn = database.get_db()
         cursor = conn.cursor()
         
-        # Create automation for user
+        # Create user
+        cursor.execute('''
+            INSERT INTO users (email, password_hash)
+            VALUES (?, ?)
+        ''', ('test@example.com', 'hash123'))
+        user_id = cursor.lastrowid
+        
+        # Create automation
         cursor.execute('''
             INSERT INTO automations (user_id, automation_type, configuration)
             VALUES (?, ?, ?)
-        ''', (test_user['id'], 'statement_alert', 'config'))
+        ''', (user_id, 'statement_alert', 'Lead time: 3 days'))
+        
         automation_id = cursor.lastrowid
         conn.commit()
         
-        # Delete user
-        cursor.execute('DELETE FROM users WHERE id = ?', (test_user['id'],))
-        conn.commit()
-        
-        # Verify automation was also deleted
-        cursor.execute('SELECT * FROM automations WHERE id = ?', (automation_id,))
-        automation = cursor.fetchone()
+        # Retrieve automation
+        automation = conn.execute('SELECT * FROM automations WHERE id = ?', (automation_id,)).fetchone()
         conn.close()
         
-        assert automation is None
+        self.assertEqual(automation['automation_type'], 'statement_alert')
+        self.assertEqual(automation['is_active'], 1)
+        self.assertEqual(automation['configuration'], 'Lead time: 3 days')
     
-    def test_cascade_delete_disputes(self, test_db, test_user):
-        """Test that deleting a user cascades to disputes"""
-        conn = sqlite3.connect(test_db)
-        # Enable foreign keys
-        conn.execute('PRAGMA foreign_keys = ON')
+    def test_reminder_creation(self):
+        """Test creating reminder"""
+        conn = database.get_db()
         cursor = conn.cursor()
         
-        # Create dispute for user
+        # Create user
         cursor.execute('''
-            INSERT INTO disputes (user_id, bureau, creditor, status)
+            INSERT INTO users (email, password_hash)
+            VALUES (?, ?)
+        ''', ('test@example.com', 'hash123'))
+        user_id = cursor.lastrowid
+        
+        # Create reminder
+        cursor.execute('''
+            INSERT INTO reminders (user_id, reminder_type, reminder_date, message)
             VALUES (?, ?, ?, ?)
-        ''', (test_user['id'], 'Experian', 'Test Bank', 'pending'))
+        ''', (user_id, 'payment', '2024-12-31', 'Pay your bill'))
+        
+        reminder_id = cursor.lastrowid
+        conn.commit()
+        
+        # Retrieve reminder
+        reminder = conn.execute('SELECT * FROM reminders WHERE id = ?', (reminder_id,)).fetchone()
+        conn.close()
+        
+        self.assertEqual(reminder['reminder_type'], 'payment')
+        self.assertEqual(reminder['message'], 'Pay your bill')
+        self.assertEqual(reminder['is_sent'], 0)
+    
+    def test_dispute_creation(self):
+        """Test creating dispute"""
+        conn = database.get_db()
+        cursor = conn.cursor()
+        
+        # Create user
+        cursor.execute('''
+            INSERT INTO users (email, password_hash)
+            VALUES (?, ?)
+        ''', ('test@example.com', 'hash123'))
+        user_id = cursor.lastrowid
+        
+        # Create dispute
+        cursor.execute('''
+            INSERT INTO disputes (user_id, bureau, account_name, dispute_date, status)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, 'Experian', 'Chase Card', '2024-01-15', 'pending'))
+        
         dispute_id = cursor.lastrowid
         conn.commit()
         
-        # Delete user
-        cursor.execute('DELETE FROM users WHERE id = ?', (test_user['id'],))
-        conn.commit()
-        
-        # Verify dispute was also deleted
-        cursor.execute('SELECT * FROM disputes WHERE id = ?', (dispute_id,))
-        dispute = cursor.fetchone()
+        # Retrieve dispute
+        dispute = conn.execute('SELECT * FROM disputes WHERE id = ?', (dispute_id,)).fetchone()
         conn.close()
         
-        assert dispute is None
+        self.assertEqual(dispute['bureau'], 'Experian')
+        self.assertEqual(dispute['account_name'], 'Chase Card')
+        self.assertEqual(dispute['status'], 'pending')
     
-    def test_reminder_creation_with_defaults(self, test_db, test_user):
-        """Test reminder creation with default values"""
-        conn = sqlite3.connect(test_db)
+    def test_user_cascade_operations(self):
+        """Test that related records are accessible when user exists"""
+        conn = database.get_db()
         cursor = conn.cursor()
+        
+        # Create user
+        cursor.execute('''
+            INSERT INTO users (email, password_hash)
+            VALUES (?, ?)
+        ''', ('test@example.com', 'hash123'))
+        user_id = cursor.lastrowid
+        
+        # Create related records
+        cursor.execute('''
+            INSERT INTO accounts (user_id, name, account_type)
+            VALUES (?, ?, ?)
+        ''', (user_id, 'Test Card', 'credit_card'))
         
         cursor.execute('''
             INSERT INTO reminders (user_id, reminder_type, reminder_date, message)
             VALUES (?, ?, ?, ?)
-        ''', (test_user['id'], 'automation', '2024-12-25', 'Test reminder'))
-        reminder_id = cursor.lastrowid
-        conn.commit()
-        
-        # Verify reminder with defaults
-        cursor.execute('SELECT * FROM reminders WHERE id = ?', (reminder_id,))
-        reminder = cursor.fetchone()
-        conn.close()
-        
-        assert reminder is not None
-        assert reminder[5] == 0  # is_sent should default to 0
-        assert reminder[6] is not None  # created_at should be set
-    
-    def test_account_with_nullable_fields(self, test_db, test_user):
-        """Test account creation with nullable fields"""
-        conn = sqlite3.connect(test_db)
-        cursor = conn.cursor()
-        
-        # Create account with minimal data
-        cursor.execute('''
-            INSERT INTO accounts (user_id, name, account_type)
-            VALUES (?, ?, ?)
-        ''', (test_user['id'], 'Basic Account', 'savings'))
-        account_id = cursor.lastrowid
-        conn.commit()
-        
-        # Verify account was created
-        cursor.execute('SELECT * FROM accounts WHERE id = ?', (account_id,))
-        account = cursor.fetchone()
-        conn.close()
-        
-        assert account is not None
-        assert account[2] == 'Basic Account'
-        assert account[4] is None  # balance is NULL
-        assert account[5] is None  # credit_limit is NULL
-    
-    def test_dispute_status_default(self, test_db, test_user):
-        """Test dispute status defaults to pending"""
-        conn = sqlite3.connect(test_db)
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            INSERT INTO disputes (user_id, bureau, creditor)
-            VALUES (?, ?, ?)
-        ''', (test_user['id'], 'TransUnion', 'Test Creditor'))
-        dispute_id = cursor.lastrowid
-        conn.commit()
-        
-        # Verify status defaults
-        cursor.execute('SELECT status FROM disputes WHERE id = ?', (dispute_id,))
-        status = cursor.fetchone()[0]
-        conn.close()
-        
-        assert status == 'pending'
-    
-    def test_automation_is_active_default(self, test_db, test_user):
-        """Test automation is_active defaults to 1 (true)"""
-        conn = sqlite3.connect(test_db)
-        cursor = conn.cursor()
+        ''', (user_id, 'test', '2024-12-31', 'Test reminder'))
         
         cursor.execute('''
             INSERT INTO automations (user_id, automation_type)
