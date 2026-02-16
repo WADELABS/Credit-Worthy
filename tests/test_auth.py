@@ -478,7 +478,6 @@ class TestAuthentication(unittest.TestCase):
     def test_jwt_token_expiration(self):
         """Test expired JWT token is rejected"""
         # Create token with negative expiration (already expired)
-        import jwt
         from datetime import timezone
         
         payload = {
