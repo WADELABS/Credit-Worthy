@@ -1,4 +1,5 @@
 flask
+flask-restx
 python-dotenv
 questionary
 colorama
@@ -10,10 +11,6 @@ flask-wtf
 bcrypt
 pyjwt
 flask-limiter
-gunicorn
-pytest
-pytest-cov
-pytest-mock
 gunicorn
 pytest>=7.0.0
 pytest-cov>=4.0.0
