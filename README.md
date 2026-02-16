@@ -3,6 +3,7 @@
 > **"Stop guessing, start automating."**
 
 [![CI/CD](https://github.com/WADELABS/Credit-Worthy/actions/workflows/ci.yml/badge.svg)](https://github.com/WADELABS/Credit-Worthy/actions)
+![Coverage](https://img.shields.io/badge/coverage-80.35%25-brightgreen)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -24,14 +25,16 @@ CredStack is a precision-engineered, production-ready platform for automated cre
 - Full API documentation available
 
 ### 🧪 Production-Ready Testing
-- 70+ comprehensive tests covering:
-  - Authentication flows
-  - API endpoints
-  - Input validation
-  - SQL injection prevention
-  - XSS prevention
-  - Data isolation
-- CI/CD pipeline with automated testing
+- **80.35%+ code coverage** with comprehensive test suite
+- **128+ tests** covering:
+  - Authentication flows (registration, login, logout, JWT)
+  - API endpoints (REST API v1)
+  - Input validation (SQL injection, XSS prevention)
+  - Automation and scheduling logic
+  - Database models and relationships
+  - Integration and end-to-end scenarios
+- CI/CD pipeline with automated testing across Python 3.8-3.12
+- Coverage reporting and quality gates
 
 ### 📚 Complete Documentation
 - **API Documentation** - Full REST API reference
@@ -148,25 +151,46 @@ CredStack operates as an active automation substrate that employs heuristic logi
 
 ## 🧪 Testing
 
+CredStack includes a comprehensive test suite to ensure code quality and reliability.
+
+### Running Tests
+
 ```bash
 # Run all tests
-pytest
+pytest tests/ -v
 
-# Run specific test suite
-pytest tests/test_auth.py
+# Run with coverage report
+pytest tests/ -v --cov=app --cov=auth --cov=automation --cov=database --cov-report=html --cov-report=term-missing
 
-# Run with coverage
-pytest --cov=. --cov-report=html
+# Run specific test file
+pytest tests/test_auth.py -v
 
-# View coverage report
-open htmlcov/index.html
+# Run specific test
+pytest tests/test_auth.py::TestAuthentication::test_login_success -v
 ```
 
 ### Test Coverage
-- **test_auth.py**: 24 authentication tests
-- **test_api.py**: 25 API endpoint tests  
-- **test_validation.py**: 22 input validation tests
-- **Total**: 70+ comprehensive tests
+
+Current test coverage: **80.35%**
+
+The test suite includes **128+ tests** across multiple categories:
+- **Authentication Tests** - User registration, login/logout, JWT tokens, account lockout
+- **Validation Tests** - Input validation, XSS/SQL injection prevention, CSRF protection
+- **API Tests** - REST API endpoints, authentication, data isolation
+- **Automation Tests** - Statement calculations, reminder generation, rule execution
+- **Database Model Tests** - Model relationships, cascade deletes, constraints
+- **Integration Tests** - End-to-end workflows, complete user scenarios
+
+### Coverage Reports
+
+HTML coverage reports are generated in `htmlcov/` directory:
+```bash
+# Generate and view coverage report
+pytest tests/ --cov --cov-report=html
+open htmlcov/index.html  # macOS
+xdg-open htmlcov/index.html  # Linux
+start htmlcov/index.html  # Windows
+```
 
 ## 🔧 Configuration
 

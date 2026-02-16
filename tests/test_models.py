@@ -81,6 +81,8 @@ class TestDatabaseModels:
     def test_cascade_delete_accounts(self, test_db, test_user):
         """Test that deleting a user cascades to accounts"""
         conn = sqlite3.connect(test_db)
+        # Enable foreign keys
+        conn.execute('PRAGMA foreign_keys = ON')
         cursor = conn.cursor()
         
         # Create account for user
@@ -105,6 +107,8 @@ class TestDatabaseModels:
     def test_cascade_delete_automations(self, test_db, test_user):
         """Test that deleting a user cascades to automations"""
         conn = sqlite3.connect(test_db)
+        # Enable foreign keys
+        conn.execute('PRAGMA foreign_keys = ON')
         cursor = conn.cursor()
         
         # Create automation for user
@@ -129,6 +133,8 @@ class TestDatabaseModels:
     def test_cascade_delete_disputes(self, test_db, test_user):
         """Test that deleting a user cascades to disputes"""
         conn = sqlite3.connect(test_db)
+        # Enable foreign keys
+        conn.execute('PRAGMA foreign_keys = ON')
         cursor = conn.cursor()
         
         # Create dispute for user

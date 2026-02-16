@@ -184,11 +184,12 @@ class TestAutomationFlow:
         """Test complete statement reminder workflow"""
         # 1. Create account with statement date
         conn = sqlite3.connect(test_db)
-        conn.execute('''
+        cursor = conn.cursor()
+        cursor.execute('''
             INSERT INTO accounts (user_id, name, account_type, statement_date, balance, credit_limit)
             VALUES (?, ?, ?, ?, ?, ?)
         ''', (test_user['id'], 'Test Card', 'credit_card', 15, 100.0, 1000.0))
-        account_id = conn.lastrowid
+        account_id = cursor.lastrowid
         conn.commit()
         conn.close()
         
@@ -314,12 +315,14 @@ class TestDataIsolation:
             INSERT INTO accounts (user_id, name, account_type)
             VALUES (?, ?, ?)
         ''', (user1_id, 'User 1 Card', 'credit_card'))
+        user1_account_id = cursor.lastrowid
         
         # Create account for user 2
         cursor.execute('''
             INSERT INTO accounts (user_id, name, account_type)
             VALUES (?, ?, ?)
         ''', (user2_id, 'User 2 Card', 'credit_card'))
+        user2_account_id = cursor.lastrowid
         
         conn.commit()
         conn.close()
@@ -333,8 +336,7 @@ class TestDataIsolation:
         # Try to access dashboard - should only see user 1's data
         response = client.get('/dashboard')
         
-        # User 1's account should be visible
-        # User 2's account should not be visible
+        # Verify both users have accounts
         conn = sqlite3.connect(test_db)
         user1_accounts = conn.execute(
             'SELECT * FROM accounts WHERE user_id = ?',
@@ -351,6 +353,7 @@ class TestDataIsolation:
         assert len(user2_accounts) > 0
         # But they should be separate
         assert user1_accounts[0][1] != user2_accounts[0][1]  # Different user_ids
+        assert user1_account_id != user2_account_id  # Different account IDs
 
 
 class TestErrorHandling:
@@ -366,8 +369,10 @@ class TestErrorHandling:
             'credit_limit': 'also_invalid'
         }, follow_redirects=True)
         
-        # Should not crash (status code should be 200, 400, or 500)
+        # Should not crash - either returns error page or redirects
+        # Status codes: 200 (redirect to form with error), 400, or 500
         assert response.status_code in [200, 400, 500]
+        # The important thing is the server didn't crash
     
     def test_missing_required_fields_handled(self, authenticated_client):
         """Test that missing required fields are handled"""

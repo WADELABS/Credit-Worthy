@@ -317,11 +317,36 @@ def add_account():
     
     name = request.form.get('name')
     account_type = request.form.get('account_type')
-    balance = float(request.form.get('balance', 0))
-    credit_limit = float(request.form.get('credit_limit', 0)) if request.form.get('credit_limit') else None
-    statement_date = int(request.form.get('statement_date')) if request.form.get('statement_date') else None
-    due_date = int(request.form.get('due_date')) if request.form.get('due_date') else None
-    min_payment = float(request.form.get('min_payment', 0)) if request.form.get('min_payment') else None
+    
+    try:
+        balance = float(request.form.get('balance', 0))
+    except (ValueError, TypeError):
+        flash('Balance must be a valid number', 'error')
+        return redirect(url_for('dashboard'))
+    
+    try:
+        credit_limit = float(request.form.get('credit_limit', 0)) if request.form.get('credit_limit') else None
+    except (ValueError, TypeError):
+        flash('Credit limit must be a valid number', 'error')
+        return redirect(url_for('dashboard'))
+    
+    try:
+        statement_date = int(request.form.get('statement_date')) if request.form.get('statement_date') else None
+    except (ValueError, TypeError):
+        flash('Statement date must be a valid number', 'error')
+        return redirect(url_for('dashboard'))
+    
+    try:
+        due_date = int(request.form.get('due_date')) if request.form.get('due_date') else None
+    except (ValueError, TypeError):
+        flash('Due date must be a valid number', 'error')
+        return redirect(url_for('dashboard'))
+    
+    try:
+        min_payment = float(request.form.get('min_payment', 0)) if request.form.get('min_payment') else None
+    except (ValueError, TypeError):
+        flash('Minimum payment must be a valid number', 'error')
+        return redirect(url_for('dashboard'))
     
     conn = get_db()
     conn.execute('''

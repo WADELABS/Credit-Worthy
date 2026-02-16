@@ -39,6 +39,10 @@ def test_db():
     
     # Create all tables
     conn = sqlite3.connect(db_path)
+    
+    # Enable foreign key constraints
+    conn.execute('PRAGMA foreign_keys = ON')
+    
     cursor = conn.cursor()
     
     # Users table
