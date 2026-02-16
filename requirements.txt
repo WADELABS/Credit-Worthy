@@ -10,7 +10,14 @@ flask-wtf
 bcrypt
 pyjwt
 flask-limiter
-flask-restx
+gunicorn
 pytest
 pytest-cov
 pytest-mock
+gunicorn
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+pytest-flask>=1.2.0
+faker>=18.0.0
+coverage>=7.0.0
