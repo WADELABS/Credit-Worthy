@@ -272,7 +272,7 @@ CredStack has a comprehensive test suite with **80%+ code coverage** ensuring re
 
 ```bash
 # Run all tests
-pytest
+pytest tests/ -v
 
 # Run all tests with coverage report
 pytest --cov=app --cov=auth --cov=automation --cov=database --cov-report=html --cov-report=term-missing

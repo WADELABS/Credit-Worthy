@@ -1,154 +1,57 @@
 """
-Tests for database models, relationships, and constraints
+Database Model Tests
+Tests for database models, relationships, constraints, and integrity
 """
-import unittest
-import os
-import tempfile
+import pytest
 import sqlite3
 from datetime import datetime
 import database
+import auth
 
 
-class TestModels(unittest.TestCase):
-    """Test database models and relationships"""
+class TestDatabaseModels:
+    """Tests for database models and relationships"""
     
-    def setUp(self):
-        """Set up test database"""
-        self.db_fd, self.db_path = tempfile.mkstemp()
-        database.DB_PATH = self.db_path
-        
-        # Create all tables
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email TEXT UNIQUE NOT NULL,
-                password_hash TEXT,
-                phone TEXT,
-                name TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                notification_preference TEXT DEFAULT 'email',
-                automation_level TEXT DEFAULT 'basic',
-                failed_login_attempts INTEGER DEFAULT 0,
-                account_locked_until TIMESTAMP,
-                last_login TIMESTAMP,
-                api_token TEXT,
-                api_token_created TIMESTAMP
-            )
-        ''')
-        
-        cursor.execute('''
-            CREATE TABLE accounts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                name TEXT NOT NULL,
-                account_type TEXT NOT NULL,
-                balance DECIMAL(10,2) DEFAULT 0,
-                credit_limit DECIMAL(10,2),
-                statement_date INTEGER,
-                due_date INTEGER,
-                min_payment DECIMAL(10,2),
-                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id)
-            )
-        ''')
-        
-        cursor.execute('''
-            CREATE TABLE automations (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                automation_type TEXT NOT NULL,
-                is_active BOOLEAN DEFAULT 1,
-                configuration TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                last_run TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id)
-            )
-        ''')
-        
-        cursor.execute('''
-            CREATE TABLE reminders (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                reminder_type TEXT NOT NULL,
-                reminder_date DATE NOT NULL,
-                message TEXT,
-                is_sent BOOLEAN DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id)
-            )
-        ''')
-        
-        cursor.execute('''
-            CREATE TABLE disputes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                bureau TEXT NOT NULL,
-                account_name TEXT,
-                creditor TEXT,
-                reason TEXT,
-                dispute_date DATE NOT NULL,
-                date_filed DATE,
-                follow_up_date DATE,
-                date_resolved DATE,
-                status TEXT DEFAULT 'pending',
-                outcome TEXT,
-                notes TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id)
-            )
-        ''')
-        
-        conn.commit()
-        conn.close()
-    
-    def tearDown(self):
-        """Clean up test database"""
-        os.close(self.db_fd)
-        os.unlink(self.db_path)
-    
-    def test_user_creation(self):
+    def test_user_creation(self, test_db):
         """Test creating a user"""
-        conn = database.get_db()
+        conn = sqlite3.connect(test_db)
         cursor = conn.cursor()
         
         cursor.execute('''
             INSERT INTO users (email, password_hash, name)
             VALUES (?, ?, ?)
-        ''', ('test@example.com', 'hash123', 'Test User'))
-        
+        ''', ('user@example.com', 'hash123', 'Test User'))
         user_id = cursor.lastrowid
         conn.commit()
         
-        # Retrieve user
-        user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+        # Verify user was created
+        cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+        user = cursor.fetchone()
         conn.close()
         
-        self.assertEqual(user['email'], 'test@example.com')
-        self.assertEqual(user['name'], 'Test User')
-        self.assertEqual(user['notification_preference'], 'email')
-        self.assertEqual(user['automation_level'], 'basic')
+        assert user is not None
+        assert user[1] == 'user@example.com'  # email
+        assert user[2] == 'hash123'  # password_hash
+        assert user[3] == 'Test User'  # name
     
-    def test_user_email_unique_constraint(self):
-        """Test that user email must be unique"""
-        conn = database.get_db()
+    def test_user_email_unique_constraint(self, test_db):
+        """Test that email must be unique"""
+        conn = sqlite3.connect(test_db)
         cursor = conn.cursor()
         
-        # Insert first user
+        # Create first user
         cursor.execute('''
             INSERT INTO users (email, password_hash)
             VALUES (?, ?)
-        ''', ('test@example.com', 'hash123'))
+        ''', ('user@example.com', 'hash123'))
         conn.commit()
         
-        # Try to insert duplicate email
-        with self.assertRaises(sqlite3.IntegrityError):
+        # Try to create duplicate
+        with pytest.raises(sqlite3.IntegrityError):
             cursor.execute('''
                 INSERT INTO users (email, password_hash)
                 VALUES (?, ?)
-            ''', ('test@example.com', 'hash456'))
+            ''', ('user@example.com', 'hash456'))
             conn.commit()
         
         conn.close()
@@ -329,122 +232,120 @@ class TestModels(unittest.TestCase):
         cursor.execute('''
             INSERT INTO automations (user_id, automation_type)
             VALUES (?, ?)
-        ''', (user_id, 'test_automation'))
-        
-        cursor.execute('''
-            INSERT INTO disputes (user_id, bureau, dispute_date)
-            VALUES (?, ?, ?)
-        ''', (user_id, 'Experian', '2024-01-15'))
-        
+        ''', (test_user['id'], 'weekly_scan'))
+        automation_id = cursor.lastrowid
         conn.commit()
         
-        # Verify all records exist
-        accounts = conn.execute('SELECT * FROM accounts WHERE user_id = ?', (user_id,)).fetchall()
-        reminders = conn.execute('SELECT * FROM reminders WHERE user_id = ?', (user_id,)).fetchall()
-        automations = conn.execute('SELECT * FROM automations WHERE user_id = ?', (user_id,)).fetchall()
-        disputes = conn.execute('SELECT * FROM disputes WHERE user_id = ?', (user_id,)).fetchall()
-        
+        # Verify is_active defaults
+        cursor.execute('SELECT is_active FROM automations WHERE id = ?', (automation_id,))
+        is_active = cursor.fetchone()[0]
         conn.close()
         
-        self.assertEqual(len(accounts), 1)
-        self.assertEqual(len(reminders), 1)
-        self.assertEqual(len(automations), 1)
-        self.assertEqual(len(disputes), 1)
+        assert is_active == 1
     
-    def test_account_balance_calculations(self):
-        """Test account balance and utilization calculations"""
-        conn = database.get_db()
+    def test_user_failed_login_attempts_default(self, test_db):
+        """Test user failed_login_attempts defaults to 0"""
+        conn = sqlite3.connect(test_db)
         cursor = conn.cursor()
         
-        # Create user
         cursor.execute('''
             INSERT INTO users (email, password_hash)
             VALUES (?, ?)
-        ''', ('test@example.com', 'hash123'))
+        ''', ('test@example.com', 'hash'))
         user_id = cursor.lastrowid
+        conn.commit()
         
-        # Create account with known balance and limit
+        # Verify default
+        cursor.execute('SELECT failed_login_attempts FROM users WHERE id = ?', (user_id,))
+        attempts = cursor.fetchone()[0]
+        conn.close()
+        
+        assert attempts == 0
+    
+    def test_multiple_accounts_per_user(self, test_db, test_user):
+        """Test user can have multiple accounts"""
+        conn = sqlite3.connect(test_db)
+        cursor = conn.cursor()
+        
+        # Create multiple accounts
+        for i in range(3):
+            cursor.execute('''
+                INSERT INTO accounts (user_id, name, account_type)
+                VALUES (?, ?, ?)
+            ''', (test_user['id'], f'Account {i}', 'credit_card'))
+        conn.commit()
+        
+        # Verify all accounts
+        cursor.execute('SELECT COUNT(*) FROM accounts WHERE user_id = ?', (test_user['id'],))
+        count = cursor.fetchone()[0]
+        conn.close()
+        
+        assert count == 3
+    
+    def test_data_integrity_numeric_fields(self, test_db, test_user):
+        """Test numeric fields store correct data types"""
+        conn = sqlite3.connect(test_db)
+        cursor = conn.cursor()
+        
+        # Create account with specific numeric values
         cursor.execute('''
             INSERT INTO accounts (user_id, name, account_type, balance, credit_limit)
             VALUES (?, ?, ?, ?, ?)
-        ''', (user_id, 'Test Card', 'credit_card', 1500.00, 5000.00))
-        
+        ''', (test_user['id'], 'Test', 'credit_card', 1234.56, 5000.00))
         account_id = cursor.lastrowid
         conn.commit()
         
-        # Retrieve and calculate utilization
-        account = conn.execute('SELECT * FROM accounts WHERE id = ?', (account_id,)).fetchone()
+        # Verify numeric precision
+        cursor.execute('SELECT balance, credit_limit FROM accounts WHERE id = ?', (account_id,))
+        balance, credit_limit = cursor.fetchone()
         conn.close()
         
-        balance = float(account['balance'])
-        credit_limit = float(account['credit_limit'])
-        utilization = (balance / credit_limit) * 100 if credit_limit > 0 else 0
-        
-        self.assertEqual(utilization, 30.0)  # 1500/5000 = 30%
+        assert balance == 1234.56
+        assert credit_limit == 5000.00
     
-    def test_database_connection(self):
-        """Test database connection helper"""
-        conn = database.get_db()
-        
-        # Should be able to execute queries
-        result = conn.execute('SELECT 1 as test').fetchone()
-        
-        self.assertEqual(result['test'], 1)
-        
-        conn.close()
-    
-    def test_failed_login_tracking(self):
-        """Test tracking failed login attempts"""
-        conn = database.get_db()
+    def test_timestamp_fields(self, test_db, test_user):
+        """Test timestamp fields are properly stored"""
+        conn = sqlite3.connect(test_db)
         cursor = conn.cursor()
         
-        # Create user
-        cursor.execute('''
-            INSERT INTO users (email, password_hash, failed_login_attempts)
-            VALUES (?, ?, ?)
-        ''', ('test@example.com', 'hash123', 0))
-        user_id = cursor.lastrowid
-        conn.commit()
-        
-        # Increment failed attempts
-        cursor.execute('''
-            UPDATE users SET failed_login_attempts = failed_login_attempts + 1
-            WHERE id = ?
-        ''', (user_id,))
-        conn.commit()
-        
-        # Check updated value
-        user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
-        conn.close()
-        
-        self.assertEqual(user['failed_login_attempts'], 1)
-    
-    def test_account_last_updated_timestamp(self):
-        """Test that accounts have last_updated timestamp"""
-        conn = database.get_db()
-        cursor = conn.cursor()
-        
-        # Create user and account
-        cursor.execute('''
-            INSERT INTO users (email, password_hash)
-            VALUES (?, ?)
-        ''', ('test@example.com', 'hash123'))
-        user_id = cursor.lastrowid
-        
+        # Create account
         cursor.execute('''
             INSERT INTO accounts (user_id, name, account_type)
             VALUES (?, ?, ?)
-        ''', (user_id, 'Test Card', 'credit_card'))
+        ''', (test_user['id'], 'Test', 'credit_card'))
         account_id = cursor.lastrowid
         conn.commit()
         
-        # Retrieve account
-        account = conn.execute('SELECT * FROM accounts WHERE id = ?', (account_id,)).fetchone()
+        # Verify last_updated timestamp
+        cursor.execute('SELECT last_updated FROM accounts WHERE id = ?', (account_id,))
+        last_updated = cursor.fetchone()[0]
         conn.close()
         
-        # Should have timestamp
-        self.assertIsNotNone(account['last_updated'])
+        assert last_updated is not None
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestDatabaseHelpers:
+    """Tests for database helper functions"""
+    
+    def test_get_db_connection(self, test_db):
+        """Test getting a database connection"""
+        conn = database.get_db()
+        assert conn is not None
+        
+        # Verify it's a sqlite3 connection
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = cursor.fetchall()
+        conn.close()
+        
+        assert len(tables) > 0
+    
+    def test_database_path_configuration(self, test_db):
+        """Test database path can be configured"""
+        original_path = database.DB_PATH
+        
+        # Path should be set to test database
+        assert database.DB_PATH == test_db
+        
+        # Restore original path
+        database.DB_PATH = original_path

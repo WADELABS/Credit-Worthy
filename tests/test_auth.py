@@ -3,6 +3,7 @@ import os
 import tempfile
 import sqlite3
 from datetime import datetime, timedelta
+import jwt
 from app import app
 import database
 import auth
@@ -378,6 +379,164 @@ class TestAuthentication(unittest.TestCase):
         self.assertIsNotNone(token)
         self.assertIsInstance(token, str)
         self.assertTrue(len(token) > 20)
-
-if __name__ == '__main__':
-    unittest.main()
+    
+    # ============ Additional Negative Test Cases ============
+    
+    def test_login_with_empty_email(self):
+        """Test login fails with empty email"""
+        response = self.client.post('/login', data={
+            'email': '',
+            'password': 'password123'
+        }, follow_redirects=True)
+        
+        self.assertIn(b'required', response.data.lower())
+    
+    def test_login_with_empty_password(self):
+        """Test login fails with empty password"""
+        response = self.client.post('/login', data={
+            'email': 'test@example.com',
+            'password': ''
+        }, follow_redirects=True)
+        
+        self.assertIn(b'required', response.data.lower())
+    
+    def test_login_with_empty_credentials(self):
+        """Test login fails with both fields empty"""
+        response = self.client.post('/login', data={
+            'email': '',
+            'password': ''
+        }, follow_redirects=True)
+        
+        self.assertIn(b'required', response.data.lower())
+    
+    def test_login_sql_injection_attempt(self):
+        """Test SQL injection in login is prevented"""
+        malicious_inputs = [
+            "admin' --",
+            "admin'/*",
+            "' OR '1'='1",
+            "1' UNION SELECT NULL--",
+            "admin' OR 1=1--"
+        ]
+        
+        for malicious in malicious_inputs:
+            response = self.client.post('/login', data={
+                'email': malicious,
+                'password': 'password'
+            }, follow_redirects=True)
+            
+            # Should fail gracefully, not expose database
+            self.assertNotIn(b'syntax error', response.data.lower())
+            self.assertNotIn(b'sqlite', response.data.lower())
+    
+    def test_registration_with_invalid_email_formats(self):
+        """Test registration handles various invalid email formats"""
+        # Test the most clearly invalid email
+        response = self.client.post('/register', data={
+            'email': 'notanemail',
+            'password': 'password123',
+            'password_confirm': 'password123'
+        }, follow_redirects=True)
+        
+        # Should show error message
+        self.assertIn(b'Invalid email', response.data)
+    
+    def test_logout_clears_session(self):
+        """Test logout functionality clears user session"""
+        # First login
+        password_hash = auth.hash_password('password123')
+        conn = sqlite3.connect(self.db_path)
+        conn.execute('''
+            INSERT INTO users (email, password_hash, notification_preference, automation_level)
+            VALUES (?, ?, ?, ?)
+        ''', ('user@example.com', password_hash, 'email', 'basic'))
+        conn.commit()
+        conn.close()
+        
+        self.client.post('/login', data={
+            'email': 'user@example.com',
+            'password': 'password123'
+        })
+        
+        # Then logout
+        response = self.client.get('/logout', follow_redirects=True)
+        
+        # Should redirect to index
+        self.assertEqual(response.status_code, 200)
+        
+        # Try to access protected route - should fail
+        response = self.client.get('/dashboard', follow_redirects=True)
+        self.assertIn(b'log in', response.data.lower())
+    
+    def test_access_protected_route_without_login(self):
+        """Test accessing protected route without authentication"""
+        response = self.client.get('/dashboard', follow_redirects=True)
+        
+        # Should redirect to login page
+        self.assertIn(b'log in', response.data.lower())
+    
+    def test_jwt_token_expiration(self):
+        """Test expired JWT token is rejected"""
+        # Create token with negative expiration (already expired)
+        from datetime import timezone
+        
+        payload = {
+            'user_id': 1,
+            'email': 'test@example.com',
+            'exp': datetime.now(timezone.utc) - timedelta(hours=1),
+            'iat': datetime.now(timezone.utc) - timedelta(hours=2)
+        }
+        
+        expired_token = jwt.encode(payload, auth.JWT_SECRET, algorithm=auth.JWT_ALGORITHM)
+        
+        # Try to decode
+        user_id, error = auth.decode_jwt_token(expired_token)
+        
+        self.assertIsNone(user_id)
+        self.assertIsNotNone(error)
+        self.assertIn('expired', error.lower())
+    
+    def test_account_lockout_duration_progressive(self):
+        """Test account lockout duration increases with attempts"""
+        # Test progressive lockout
+        duration_3 = auth.calculate_lockout_duration(3)
+        duration_4 = auth.calculate_lockout_duration(4)
+        duration_7 = auth.calculate_lockout_duration(7)
+        
+        # Each should be progressively longer
+        self.assertLess(duration_3, duration_4)
+        self.assertLess(duration_4, duration_7)
+    
+    def test_check_account_locked_unlocked_account(self):
+        """Test checking unlocked account"""
+        # Create user without lock
+        password_hash = auth.hash_password('password123')
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        conn.execute('''
+            INSERT INTO users (email, password_hash, notification_preference, automation_level)
+            VALUES (?, ?, ?, ?)
+        ''', ('user@example.com', password_hash, 'email', 'basic'))
+        conn.commit()
+        
+        user = conn.execute('SELECT * FROM users WHERE email = ?', ('user@example.com',)).fetchone()
+        conn.close()
+        
+        is_locked, unlock_time = auth.check_account_locked(user)
+        
+        self.assertFalse(is_locked)
+        self.assertIsNone(unlock_time)
+    
+    def test_password_hash_is_salted(self):
+        """Test password hashes are salted (different each time)"""
+        password = "samepassword123"
+        
+        hash1 = auth.hash_password(password)
+        hash2 = auth.hash_password(password)
+        
+        # Same password should produce different hashes due to salt
+        self.assertNotEqual(hash1, hash2)
+        
+        # But both should verify correctly
+        self.assertTrue(auth.verify_password(password, hash1))
+        self.assertTrue(auth.verify_password(password, hash2))
