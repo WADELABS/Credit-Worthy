@@ -111,7 +111,7 @@ class DisputeList(Resource):
                          400: 'Validation error',
                          401: 'Unauthorized',
                      })
-    @disputes_ns.expect(dispute_create_model, validate=True)
+    @disputes_ns.expect(dispute_create_model)
     @disputes_ns.marshal_with(dispute_created_response, code=201)
     @auth.token_required
     def post(self):
@@ -190,7 +190,7 @@ class DisputeDetail(Resource):
                          401: 'Unauthorized',
                          404: 'Dispute not found',
                      })
-    @disputes_ns.expect(dispute_update_model, validate=True)
+    @disputes_ns.expect(dispute_update_model)
     @disputes_ns.marshal_with(success_response)
     @auth.token_required
     def put(self, dispute_id):

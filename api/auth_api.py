@@ -40,7 +40,7 @@ class Register(Resource):
                      201: ('User created successfully', token_response),
                      400: ('Validation error', error_response),
                  })
-    @auth_ns.expect(register_model, validate=True)
+    @auth_ns.expect(register_model)
     @auth_ns.marshal_with(token_response, code=201)
     def post(self):
         """Register a new user"""
@@ -98,7 +98,7 @@ class Login(Resource):
                      200: ('Login successful', token_response),
                      401: ('Invalid credentials', error_response),
                  })
-    @auth_ns.expect(login_model, validate=True)
+    @auth_ns.expect(login_model)
     @auth_ns.marshal_with(token_response)
     def post(self):
         """Login and get JWT token"""

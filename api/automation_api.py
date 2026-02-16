@@ -90,7 +90,7 @@ class AutomationRuleList(Resource):
                            400: 'Validation error',
                            401: 'Unauthorized',
                        })
-    @automation_ns.expect(automation_create_model, validate=True)
+    @automation_ns.expect(automation_create_model)
     @automation_ns.marshal_with(automation_created_response, code=201)
     @auth.token_required
     def post(self):
@@ -170,7 +170,7 @@ class AutomationRuleDetail(Resource):
                            401: 'Unauthorized',
                            404: 'Rule not found',
                        })
-    @automation_ns.expect(automation_update_model, validate=True)
+    @automation_ns.expect(automation_update_model)
     @automation_ns.marshal_with(success_response)
     @auth.token_required
     def put(self, rule_id):

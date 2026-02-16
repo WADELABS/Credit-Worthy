@@ -72,7 +72,7 @@ class UserProfile(Resource):
                       200: ('Profile updated', success_response),
                       401: 'Unauthorized',
                   })
-    @users_ns.expect(user_update_model, validate=True)
+    @users_ns.expect(user_update_model)
     @users_ns.marshal_with(success_response)
     @auth.token_required
     def put(self):
