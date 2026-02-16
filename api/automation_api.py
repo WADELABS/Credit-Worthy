@@ -191,26 +191,26 @@ class AutomationRuleDetail(Resource):
         is_active = data.get('is_active')
         configuration = data.get('configuration')
         
-        updates = []
-        params = []
-        
-        if is_active is not None:
-            updates.append('is_active = ?')
-            params.append(1 if is_active else 0)
-        
-        if configuration is not None:
-            updates.append('configuration = ?')
-            params.append(configuration)
-        
-        if not updates:
+        # Use explicit UPDATE statements for security
+        if is_active is not None and configuration is not None:
+            conn.execute('''
+                UPDATE automations SET is_active = ?, configuration = ?
+                WHERE id = ? AND user_id = ?
+            ''', (1 if is_active else 0, configuration, rule_id, user_id))
+        elif is_active is not None:
+            conn.execute('''
+                UPDATE automations SET is_active = ?
+                WHERE id = ? AND user_id = ?
+            ''', (1 if is_active else 0, rule_id, user_id))
+        elif configuration is not None:
+            conn.execute('''
+                UPDATE automations SET configuration = ?
+                WHERE id = ? AND user_id = ?
+            ''', (configuration, rule_id, user_id))
+        else:
             conn.close()
             return {'message': 'No updates provided'}
         
-        params.extend([rule_id, user_id])
-        conn.execute(f'''
-            UPDATE automations SET {', '.join(updates)}
-            WHERE id = ? AND user_id = ?
-        ''', params)
         conn.commit()
         conn.close()
         

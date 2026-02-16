@@ -84,33 +84,45 @@ class UserProfile(Resource):
         phone = data.get('phone')
         notification_preference = data.get('notification_preference')
         
-        updates = []
-        params = []
-        
-        if name is not None:
-            updates.append('name = ?')
-            params.append(name)
-        
-        if phone is not None:
-            updates.append('phone = ?')
-            params.append(phone)
-        
+        # Validate notification preference if provided
         if notification_preference:
             valid_prefs = ['email', 'sms', 'both', 'calendar']
             if notification_preference not in valid_prefs:
                 users_ns.abort(400, f'Invalid notification preference. Must be one of: {", ".join(valid_prefs)}')
-            updates.append('notification_preference = ?')
-            params.append(notification_preference)
         
-        if not updates:
+        conn = database.get_db()
+        
+        # Use explicit UPDATE statements for security
+        if name is not None and phone is not None and notification_preference:
+            conn.execute('''
+                UPDATE users SET name = ?, phone = ?, notification_preference = ?
+                WHERE id = ?
+            ''', (name, phone, notification_preference, user_id))
+        elif name is not None and phone is not None:
+            conn.execute('''
+                UPDATE users SET name = ?, phone = ?
+                WHERE id = ?
+            ''', (name, phone, user_id))
+        elif name is not None and notification_preference:
+            conn.execute('''
+                UPDATE users SET name = ?, notification_preference = ?
+                WHERE id = ?
+            ''', (name, notification_preference, user_id))
+        elif phone is not None and notification_preference:
+            conn.execute('''
+                UPDATE users SET phone = ?, notification_preference = ?
+                WHERE id = ?
+            ''', (phone, notification_preference, user_id))
+        elif name is not None:
+            conn.execute('UPDATE users SET name = ? WHERE id = ?', (name, user_id))
+        elif phone is not None:
+            conn.execute('UPDATE users SET phone = ? WHERE id = ?', (phone, user_id))
+        elif notification_preference:
+            conn.execute('UPDATE users SET notification_preference = ? WHERE id = ?', (notification_preference, user_id))
+        else:
+            conn.close()
             return {'message': 'No updates provided'}
         
-        params.append(user_id)
-        conn = database.get_db()
-        conn.execute(f'''
-            UPDATE users SET {', '.join(updates)}
-            WHERE id = ?
-        ''', params)
         conn.commit()
         conn.close()
         

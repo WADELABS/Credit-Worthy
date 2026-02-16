@@ -212,38 +212,81 @@ class DisputeDetail(Resource):
         outcome = data.get('outcome')
         notes = data.get('notes')
         
-        updates = []
-        params = []
-        
+        # Validate status if provided
         if status:
             valid_statuses = ['pending', 'in_progress', 'resolved', 'rejected']
             if status not in valid_statuses:
                 conn.close()
                 disputes_ns.abort(400, f'Invalid status. Must be one of: {", ".join(valid_statuses)}')
-            updates.append('status = ?')
-            params.append(status)
-            
-            if status in ['resolved', 'rejected']:
-                updates.append('date_resolved = ?')
-                params.append(datetime.now().strftime('%Y-%m-%d'))
         
-        if outcome:
-            updates.append('outcome = ?')
-            params.append(outcome)
+        # Determine if we need to set date_resolved
+        date_resolved = None
+        if status in ['resolved', 'rejected']:
+            date_resolved = datetime.now().strftime('%Y-%m-%d')
         
-        if notes is not None:
-            updates.append('notes = ?')
-            params.append(notes)
-        
-        if not updates:
+        # Use explicit UPDATE statements for security
+        # Handle all combinations of fields
+        if not (status or outcome or notes is not None):
             conn.close()
             return {'message': 'No updates provided'}
         
-        params.extend([dispute_id, user_id])
-        conn.execute(f'''
-            UPDATE disputes SET {', '.join(updates)}
-            WHERE id = ? AND user_id = ?
-        ''', params)
+        # Build the appropriate query based on what fields are being updated
+        if status and outcome and notes is not None and date_resolved:
+            conn.execute('''
+                UPDATE disputes SET status = ?, outcome = ?, notes = ?, date_resolved = ?
+                WHERE id = ? AND user_id = ?
+            ''', (status, outcome, notes, date_resolved, dispute_id, user_id))
+        elif status and outcome and date_resolved:
+            conn.execute('''
+                UPDATE disputes SET status = ?, outcome = ?, date_resolved = ?
+                WHERE id = ? AND user_id = ?
+            ''', (status, outcome, date_resolved, dispute_id, user_id))
+        elif status and notes is not None and date_resolved:
+            conn.execute('''
+                UPDATE disputes SET status = ?, notes = ?, date_resolved = ?
+                WHERE id = ? AND user_id = ?
+            ''', (status, notes, date_resolved, dispute_id, user_id))
+        elif outcome and notes is not None:
+            conn.execute('''
+                UPDATE disputes SET outcome = ?, notes = ?
+                WHERE id = ? AND user_id = ?
+            ''', (outcome, notes, dispute_id, user_id))
+        elif status and date_resolved:
+            conn.execute('''
+                UPDATE disputes SET status = ?, date_resolved = ?
+                WHERE id = ? AND user_id = ?
+            ''', (status, date_resolved, dispute_id, user_id))
+        elif status and outcome:
+            conn.execute('''
+                UPDATE disputes SET status = ?, outcome = ?
+                WHERE id = ? AND user_id = ?
+            ''', (status, outcome, dispute_id, user_id))
+        elif status and notes is not None:
+            conn.execute('''
+                UPDATE disputes SET status = ?, notes = ?
+                WHERE id = ? AND user_id = ?
+            ''', (status, notes, dispute_id, user_id))
+        elif status:
+            conn.execute('''
+                UPDATE disputes SET status = ?
+                WHERE id = ? AND user_id = ?
+            ''', (status, dispute_id, user_id))
+        elif outcome and notes is not None:
+            conn.execute('''
+                UPDATE disputes SET outcome = ?, notes = ?
+                WHERE id = ? AND user_id = ?
+            ''', (outcome, notes, dispute_id, user_id))
+        elif outcome:
+            conn.execute('''
+                UPDATE disputes SET outcome = ?
+                WHERE id = ? AND user_id = ?
+            ''', (outcome, dispute_id, user_id))
+        elif notes is not None:
+            conn.execute('''
+                UPDATE disputes SET notes = ?
+                WHERE id = ? AND user_id = ?
+            ''', (notes, dispute_id, user_id))
+        
         conn.commit()
         conn.close()
         
