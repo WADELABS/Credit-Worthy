@@ -62,10 +62,13 @@ Get a quick overview of CredStack's workflow:
 - **Security headers** (HSTS, X-Frame-Options, etc.)
 
 ### 🚀 RESTful API (v1)
+- **Interactive Swagger UI** at `/api/docs` for easy API exploration
 - Complete REST API with JWT authentication
+- OpenAPI/Swagger specification with full request/response schemas
 - Endpoints for credit data, automation, disputes, and user management
+- Pagination, filtering, and sorting on list endpoints
 - Rate limiting and comprehensive error handling
-- Full API documentation available
+- Full API documentation with examples
 
 ### 🧪 Comprehensive Test Suite (80%+ Coverage)
 - **101 comprehensive tests** covering:
@@ -231,10 +234,18 @@ SENDGRID_API_KEY=<your-sendgrid-key>
 - Comprehensive dispute history
 
 ### API Access
-- **RESTful API** with JWT authentication
-- **Endpoints** for credit data, automation, disputes, and user management
+- **Interactive Swagger UI** at `http://localhost:5000/api/docs`
+- **RESTful API v1** with JWT authentication
+- **Complete OpenAPI/Swagger specification** with request/response schemas
+- **Endpoints** for:
+  - Authentication (register, login, token refresh)
+  - User profile management
+  - Credit score and account information
+  - Dispute tracking and management
+  - Automation rule configuration
 - **Rate limiting** for security
-- **Comprehensive documentation** in `docs/API.md`
+- **Pagination and filtering** on list endpoints
+- **Comprehensive documentation** with examples
 
 ### Security Features
 - Bcrypt password hashing (never store plain text)
@@ -427,6 +438,15 @@ After deploying, verify:
 
 ## 🔐 API Usage
 
+### Interactive Documentation
+
+The easiest way to explore the API is through the **Swagger UI** interface:
+
+1. Start the application: `python app.py`
+2. Navigate to: `http://localhost:5000/api/docs`
+3. Use the "Authorize" button to authenticate with your JWT token
+4. Try out endpoints directly from the browser
+
 ### Quick Example
 
 ```python
@@ -434,27 +454,85 @@ import requests
 
 # Register and get token
 response = requests.post(
-    'http://localhost:5000/api/auth/register',
-    json={'email': 'user@example.com', 'password': 'password123'}
+    'http://localhost:5000/api/v1/auth/register',
+    json={
+        'email': 'user@example.com',
+        'password': 'Password123',
+        'name': 'John Doe'
+    }
 )
 token = response.json()['token']
 
-# Get credit score
+# Set up authentication header
 headers = {'Authorization': f'Bearer {token}'}
+
+# Get credit score
 response = requests.get(
     'http://localhost:5000/api/v1/credit/score',
     headers=headers
 )
 print(response.json())
+# Output: {'score': 720, 'utilization': 15.5, 'date': '2024-01-15', 'accounts_count': 3}
+
+# Create a dispute
+response = requests.post(
+    'http://localhost:5000/api/v1/disputes',
+    headers=headers,
+    json={
+        'bureau': 'Experian',
+        'creditor': 'Chase Bank',
+        'reason': 'Incorrect balance',
+        'notes': 'Balance should be $0 after payment'
+    }
+)
+print(response.json())
+# Output: {'id': 1, 'message': 'Dispute created successfully', 'follow_up_date': '2024-01-29'}
+
+# List automation rules
+response = requests.get(
+    'http://localhost:5000/api/v1/automation/rules',
+    headers=headers
+)
+print(response.json())
 ```
 
-See **[docs/API.md](docs/API.md)** for complete API documentation.
+### API Endpoints Overview
+
+#### Authentication
+- `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - Login and get JWT token
+- `POST /api/v1/auth/token/refresh` - Refresh JWT token
+
+#### User Profile
+- `GET /api/v1/users/profile` - Get current user profile
+- `PUT /api/v1/users/profile` - Update user profile
+
+#### Credit Information
+- `GET /api/v1/credit/score` - Get estimated credit score
+- `GET /api/v1/credit/accounts` - List credit accounts
+
+#### Disputes
+- `GET /api/v1/disputes` - List disputes (with filtering)
+- `POST /api/v1/disputes` - Create new dispute
+- `GET /api/v1/disputes/{id}` - Get specific dispute
+- `PUT /api/v1/disputes/{id}` - Update dispute
+- `DELETE /api/v1/disputes/{id}` - Delete dispute
+
+#### Automation Rules
+- `GET /api/v1/automation/rules` - List automation rules
+- `POST /api/v1/automation/rules` - Create automation rule
+- `GET /api/v1/automation/rules/{id}` - Get specific rule
+- `PUT /api/v1/automation/rules/{id}` - Update rule
+- `DELETE /api/v1/automation/rules/{id}` - Delete rule
+
+For detailed API documentation with request/response schemas, see the **[Swagger UI](http://localhost:5000/api/docs)** or **[docs/API.md](docs/API.md)**.
 
 ## 🛠️ Technology Stack
 
 - **Backend**: Python 3.8+ / Flask
 - **Database**: SQLite (local-first architecture)
 - **Authentication**: Flask-Login, bcrypt, PyJWT
+- **API Documentation**: Flask-RESTX (OpenAPI/Swagger)
 - **Security**: Flask-WTF (CSRF), Flask-Limiter (rate limiting)
 - **Testing**: pytest, pytest-cov, pytest-mock
 - **UI**: Glassmorphism design with responsive layout
